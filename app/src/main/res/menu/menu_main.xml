@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nrDisabled"
+        android:title="@string/nrDisabled" />
+    <item
+        android:id="@+id/nrNsa"
+        android:title="@string/nrNsa" />
+    <item
+        android:id="@+id/nrSa"
+        android:title="@string/nrSa" />
+    <item
+        android:id="@+id/nrSaNsa"
+        android:title="@string/nrSaNsa" />
+</menu>
