@@ -32,7 +32,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val nrMode = when (item.itemId) {
+        val value = when (item.itemId) {
             R.id.nrDisabled -> NrMode.DISABLED
             R.id.nrNsa -> NrMode.NSA
             R.id.nrSa -> NrMode.SA
@@ -40,30 +40,31 @@ class MainActivity : AppCompatActivity() {
             else -> NrMode.DISABLED
         }
 
-        if (this.nrMode == null) {
+        if (nrMode == null) {
             Toast.makeText(
                 applicationContext, getString(R.string.checkRootAccess), Toast.LENGTH_SHORT
             ).show()
         } else {
-            nrModeDialog(nrMode)
+            nrModeDialog(value)
         }
 
         return true
     }
 
-    private fun nrModeDialog(nrMode: NrMode) {
+    private fun nrModeDialog(value: NrMode) {
         MaterialAlertDialogBuilder(this)
             .setTitle(getString(R.string.changeNrModeTitle))
-            .setMessage(getString(R.string.changeNrModeMessage, nrMode.label))
+            .setMessage(getString(R.string.changeNrModeMessage, value.label))
             .setPositiveButton(getString(R.string.yes)) { _, _ ->
-                if (this.nrMode == nrMode) {
+                if (nrMode == value) {
                     Toast.makeText(
                         applicationContext, getString(R.string.nrSameMode), Toast.LENGTH_SHORT
                     ).show()
                     return@setPositiveButton
                 }
-                runCatching { setNrMode(nrMode) }.onSuccess {
-                    binding.nrMode.text = nrMode.label
+                runCatching { setNrMode(value) }.onSuccess {
+                    nrMode = value
+                    binding.nrMode.text = value.label
                     Toast.makeText(
                         applicationContext, getString(R.string.rebootDevice), Toast.LENGTH_SHORT
                     ).show()
