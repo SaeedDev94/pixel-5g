@@ -18,12 +18,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        runCatching { getNrMode() }.onSuccess {
-            nrMode = it
-            binding.nrMode.text = it.label
-        }.onFailure {
-            binding.nrMode.text = it.message
-        }
+        resolveNrMode()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -49,6 +44,18 @@ class MainActivity : AppCompatActivity() {
         }
 
         return true
+    }
+
+    private fun resolveNrMode() {
+        runCatching {
+            val result = runATCommand("GETNV=\"$NR_MODE\"")
+            makeNrMode(getOutput(result, NR_MODE))
+        }.onSuccess {
+            nrMode = it
+            binding.nrMode.text = it.label
+        }.onFailure {
+            binding.nrMode.text = it.message
+        }
     }
 
     private fun nrModeDialog(value: NrMode) {
@@ -98,11 +105,6 @@ class MainActivity : AppCompatActivity() {
     private fun setNrManual(): NrManual {
         val result = runATCommand("SETNV=\"$NR_MANUAL\",0,\"${NrManual.ENABLED.value}\"")
         return makeNrManual(getOutput(result, NR_MANUAL))
-    }
-
-    private fun getNrMode(): NrMode {
-        val result = runATCommand("GETNV=\"$NR_MODE\"")
-        return makeNrMode(getOutput(result, NR_MODE))
     }
 
     private fun setNrMode(nrMode: NrMode): NrMode {
