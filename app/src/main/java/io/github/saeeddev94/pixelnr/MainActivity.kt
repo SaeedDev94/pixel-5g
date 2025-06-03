@@ -63,8 +63,8 @@ class MainActivity : AppCompatActivity() {
                     return@setPositiveButton
                 }
                 runCatching { setNrMode(value) }.onSuccess {
-                    nrMode = value
-                    binding.nrMode.text = value.label
+                    nrMode = it
+                    binding.nrMode.text = it.label
                     Toast.makeText(
                         applicationContext, getString(R.string.rebootDevice), Toast.LENGTH_SHORT
                     ).show()
@@ -79,21 +79,29 @@ class MainActivity : AppCompatActivity() {
             .show()
     }
 
+    private fun makeNrMode(value: String): NrMode {
+        return NrMode.fromValue(value) ?:
+        throw Exception(getString(R.string.resInvalidCase))
+    }
+
     private fun getNrMode(): NrMode {
         val result = runATCommand("GETNV=\"$NR_MODE\"")
+        return makeNrMode(getOutput(result, NR_MODE))
+    }
+
+    private fun setNrMode(nrMode: NrMode): NrMode {
+        val result = runATCommand("SETNV=\"$NR_MODE\",0,\"${nrMode.value}\"")
+        return makeNrMode(getOutput(result, NR_MODE))
+    }
+
+    private fun getOutput(result: Shell.Result, key: String): String {
         val output = result.out.joinToString("\n").trim()
         if (!result.isSuccess) throw Exception(getString(R.string.cmdFailed))
         if (!output.contains("OK")) throw Exception(getString(R.string.resNoOk))
-        val regex = "\"$NR_MODE\",0,\"(.*)\"".toRegex()
+        val regex = "\"$key\",0,\"(.*)\"".toRegex()
         val matches = regex.find(output) ?: throw Exception(getString(R.string.resRegexpIssue))
         val group = matches.groups[1] ?: throw Exception(getString(R.string.resMatchIssue))
-        val nrMode = NrMode.fromValue(group.value) ?: throw Exception(getString(R.string.resInvalidCase))
-        return nrMode
-    }
-
-    private fun setNrMode(nrMode: NrMode) {
-        val result = runATCommand("SETNV=\"$NR_MODE\",0,\"${nrMode.value}\"")
-        if (!result.isSuccess) throw Exception(getString(R.string.cmdFailed))
+        return group.value
     }
 
     private fun runATCommand(nv: String): Shell.Result {
