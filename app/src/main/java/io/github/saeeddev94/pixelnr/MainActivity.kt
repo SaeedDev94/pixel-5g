@@ -62,7 +62,10 @@ class MainActivity : AppCompatActivity() {
                     ).show()
                     return@setPositiveButton
                 }
-                runCatching { setNrMode(value) }.onSuccess {
+                runCatching {
+                    setNrManual()
+                    setNrMode(value)
+                }.onSuccess {
                     nrMode = it
                     binding.nrMode.text = it.label
                     Toast.makeText(
@@ -79,9 +82,22 @@ class MainActivity : AppCompatActivity() {
             .show()
     }
 
+    private fun makeNrManual(value: String): NrManual {
+        val nrManual = NrManual.fromValue(value)
+        if (nrManual == null || nrManual == NrManual.DISABLED) {
+            throw Exception(getString(R.string.resInvalidCase))
+        }
+        return nrManual
+    }
+
     private fun makeNrMode(value: String): NrMode {
         return NrMode.fromValue(value) ?:
         throw Exception(getString(R.string.resInvalidCase))
+    }
+
+    private fun setNrManual(): NrManual {
+        val result = runATCommand("SETNV=\"$NR_MANUAL\",0,\"${NrManual.ENABLED.value}\"")
+        return makeNrManual(getOutput(result, NR_MANUAL))
     }
 
     private fun getNrMode(): NrMode {
@@ -112,5 +128,6 @@ class MainActivity : AppCompatActivity() {
     companion object {
         private const val MODEM = "/dev/umts_router"
         private const val NR_MODE = "NR.CONFIG.MODE"
+        private const val NR_MANUAL = "NR.MANUAL.MODE.ENABLE"
     }
 }
