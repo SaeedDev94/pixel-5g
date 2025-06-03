@@ -34,15 +34,7 @@ class MainActivity : AppCompatActivity() {
             R.id.nrSaNsa -> NrMode.SA_NAS
             else -> NrMode.DISABLED
         }
-
-        if (nrMode == null) {
-            Toast.makeText(
-                applicationContext, getString(R.string.checkRootAccess), Toast.LENGTH_SHORT
-            ).show()
-        } else {
-            nrModeDialog(value)
-        }
-
+        nrModeDialog(value)
         return true
     }
 
@@ -54,8 +46,22 @@ class MainActivity : AppCompatActivity() {
             nrMode = it
             binding.nrMode.text = it.label
         }.onFailure {
-            binding.nrMode.text = it.message
+            nrModeErrorDialog(it.message ?: "")
         }
+    }
+
+    private fun nrModeErrorDialog(message: String) {
+        MaterialAlertDialogBuilder(this)
+            .setTitle(getString(R.string.errorDialogTitle))
+            .setMessage(message)
+            .setPositiveButton(getString(R.string.errorDialogReload)) { _, _ ->
+                resolveNrMode()
+            }
+            .setNegativeButton(getString(R.string.errorDialogExit)) { _, _ ->
+                finish()
+            }
+            .setCancelable(false)
+            .show()
     }
 
     private fun nrModeDialog(value: NrMode) {

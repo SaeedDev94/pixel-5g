@@ -12,7 +12,6 @@
     <string name="resRegexpIssue">Regexp probléma!</string>
     <string name="resMatchIssue">Match probléma!</string>
     <string name="resInvalidCase">Érvénytelen eset!</string>
-    <string name="checkRootAccess">Ellenőrizze a root hozzáférést!</string>
     <string name="changeNrModeTitle">NR mód változtatása</string>
     <string name="changeNrModeMessage">Biztos átállítja az NR módot erre: \"%1$s\" ?</string>
     <string name="yes">Igen</string>

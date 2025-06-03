@@ -12,7 +12,9 @@
     <string name="resRegexpIssue">Regexp Issue!</string>
     <string name="resMatchIssue">Match Issue!</string>
     <string name="resInvalidCase">Invalid Case!</string>
-    <string name="checkRootAccess">Check root access!</string>
+    <string name="errorDialogTitle">Error</string>
+    <string name="errorDialogReload">Reload</string>
+    <string name="errorDialogExit">Exit</string>
     <string name="changeNrModeTitle">Change NR Mode?</string>
     <string name="changeNrModeMessage">Set NR Mode to \"%1$s\" ?</string>
     <string name="yes">Yes</string>
