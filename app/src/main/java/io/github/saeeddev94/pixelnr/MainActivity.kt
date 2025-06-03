@@ -34,7 +34,7 @@ class MainActivity : AppCompatActivity() {
             R.id.nrSaNsa -> NrMode.SA_NAS
             else -> NrMode.DISABLED
         }
-        nrModeDialog(value)
+        nrModeConfirmDialog(value)
         return true
     }
 
@@ -64,7 +64,7 @@ class MainActivity : AppCompatActivity() {
             .show()
     }
 
-    private fun nrModeDialog(value: NrMode) {
+    private fun nrModeConfirmDialog(value: NrMode) {
         MaterialAlertDialogBuilder(this)
             .setTitle(getString(R.string.changeNrModeTitle))
             .setMessage(getString(R.string.changeNrModeMessage, value.label))
