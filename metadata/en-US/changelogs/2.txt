@@ -1,0 +1,3 @@
+- Hungarian translation by @TheMartyMan
+- Enable Manual NR Mode
+- Show error dialog with reload and exit actions on initial app load if resolving nr mode failed
