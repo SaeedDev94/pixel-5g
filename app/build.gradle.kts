@@ -35,6 +35,19 @@ android {
         buildConfig = true
         viewBinding = true
     }
+    signingConfigs {
+        create("release") {
+            storeFile = rootProject.file("release-key.jks")
+            storePassword = System.getenv("KEY_STORE_PASSWORD")
+            keyAlias = System.getenv("KEY_ALIAS")
+            keyPassword = System.getenv("KEY_PASSWORD")
+        }
+    }
+    buildTypes {
+        release {
+            signingConfig = signingConfigs.getByName("release")
+        }
+    }
 }
 
 dependencies {
