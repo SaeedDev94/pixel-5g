@@ -1,0 +1,65 @@
+name: Release CI
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Get Version Code
+        run: |
+          VERSION_CODE=$(grep -oP "versionCode\s*=?\s*\K\d+" ${{ github.workspace }}/app/build.gradle.kts)
+          echo "VERSION_CODE=$VERSION_CODE" >> $GITHUB_ENV
+
+      - name: Create release key
+        run: |
+          KEY_STORE_TXT="${{ github.workspace }}/release-key.txt"
+          KEY_STORE_JKS="${{ github.workspace }}/release-key.jks"
+          echo "KEY_STORE_TXT=$KEY_STORE_TXT" >> $GITHUB_ENV
+          echo "KEY_STORE_JKS=$KEY_STORE_JKS" >> $GITHUB_ENV
+          echo "${{ secrets.KEY_STORE_FILE }}" > "$KEY_STORE_TXT"
+          base64 --decode "$KEY_STORE_TXT" > "$KEY_STORE_JKS"
+
+      - name: JDK 17 Setup
+        uses: actions/setup-java@v4.7.1
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Gradle Build
+        run: |
+          KEY_STORE_PASSWORD='${{ secrets.KEY_STORE_PASSWORD }}' \
+          KEY_ALIAS='${{ secrets.KEY_ALIAS }}' \
+          KEY_PASSWORD='${{ secrets.KEY_PASSWORD }}' \
+          ./gradlew assembleRelease
+
+      - name: Remove release key
+        run: rm "${{ env.KEY_STORE_TXT }}" "${{ env.KEY_STORE_JKS }}"
+
+      - name: Move build to dist
+        run: |
+          BUILD="${{ github.workspace }}/app/build/outputs/apk/release/app-release.apk"
+          DIST="${{ github.workspace }}/app/release"
+          NAME="Pixel5G-$GITHUB_REF_NAME.apk"
+          mkdir "$DIST"
+          mv "$BUILD" "$DIST/$NAME"
+          echo "DIST=$DIST" >> $GITHUB_ENV
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          prerelease: false
+          draft: false
+          files: ${{ env.DIST }}/*
+          body_path: ${{ github.workspace }}/metadata/en-US/changelogs/${{ env.VERSION_CODE }}.txt
