@@ -70,9 +70,7 @@ class MainActivity : AppCompatActivity() {
             .setMessage(getString(R.string.changeNrModeMessage, value.label))
             .setPositiveButton(getString(R.string.yes)) { _, _ ->
                 if (nrMode == value) {
-                    Toast.makeText(
-                        applicationContext, getString(R.string.nrSameMode), Toast.LENGTH_SHORT
-                    ).show()
+                    showToast(getString(R.string.nrSameMode))
                     return@setPositiveButton
                 }
                 runCatching {
@@ -81,13 +79,9 @@ class MainActivity : AppCompatActivity() {
                 }.onSuccess {
                     nrMode = it
                     binding.nrMode.text = it.label
-                    Toast.makeText(
-                        applicationContext, getString(R.string.rebootDevice), Toast.LENGTH_SHORT
-                    ).show()
+                    showToast(getString(R.string.rebootDevice))
                 }.onFailure {
-                    Toast.makeText(
-                        applicationContext, it.message, Toast.LENGTH_SHORT
-                    ).show()
+                    showToast(it.message ?: "")
                 }
             }
             .setNegativeButton(getString(R.string.cancel)) { _, _ -> }
@@ -133,9 +127,13 @@ class MainActivity : AppCompatActivity() {
         return Shell.cmd(command).exec()
     }
 
+    private fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
+
     companion object {
         private const val MODEM = "/dev/umts_router"
-        private const val NR_MODE = "NR.CONFIG.MODE"
         private const val NR_MANUAL = "NR.MANUAL.MODE.ENABLE"
+        private const val NR_MODE = "NR.CONFIG.MODE"
     }
 }
