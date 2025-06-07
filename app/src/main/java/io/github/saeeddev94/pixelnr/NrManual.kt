@@ -1,10 +1,11 @@
 package io.github.saeeddev94.pixelnr
 
-enum class NrManual(val value: String) {
+enum class NrManual(
+    override val value: String,
+) : NvEnum<NrManual> {
+
     DISABLED("00"),
     ENABLED("01");
 
-    companion object {
-        fun fromValue(value: String): NrManual? = NrManual.entries.find { it.value == value }
-    }
+    override fun fromValue(value: String): NrManual? = NrManual.entries.find { it.value == value }
 }

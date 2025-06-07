@@ -6,12 +6,12 @@ import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.topjohnwu.superuser.Shell
 import io.github.saeeddev94.pixelnr.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    private var modem = Modem(this)
     private var nrMode: NrMode? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,8 +40,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun resolveNrMode() {
         runCatching {
-            val result = runATCommand("GETNV=\"$NR_MODE\"")
-            makeNrMode(getOutput(result, NR_MODE))
+            modem.getNv(NR_MODE, NrMode.DISABLED)
         }.onSuccess {
             nrMode = it
             binding.nrMode.text = it.label
@@ -74,8 +73,8 @@ class MainActivity : AppCompatActivity() {
                     return@setPositiveButton
                 }
                 runCatching {
-                    setNrManual()
-                    setNrMode(value)
+                    modem.setNv(NR_MANUAL, NrManual.ENABLED)
+                    modem.setNv(NR_MODE, value)
                 }.onSuccess {
                     nrMode = it
                     binding.nrMode.text = it.label
@@ -89,50 +88,11 @@ class MainActivity : AppCompatActivity() {
             .show()
     }
 
-    private fun makeNrManual(value: String): NrManual {
-        val nrManual = NrManual.fromValue(value)
-        if (nrManual == null || nrManual == NrManual.DISABLED) {
-            throw Exception(getString(R.string.resInvalidCase))
-        }
-        return nrManual
-    }
-
-    private fun makeNrMode(value: String): NrMode {
-        return NrMode.fromValue(value) ?:
-        throw Exception(getString(R.string.resInvalidCase))
-    }
-
-    private fun setNrManual(): NrManual {
-        val result = runATCommand("SETNV=\"$NR_MANUAL\",0,\"${NrManual.ENABLED.value}\"")
-        return makeNrManual(getOutput(result, NR_MANUAL))
-    }
-
-    private fun setNrMode(nrMode: NrMode): NrMode {
-        val result = runATCommand("SETNV=\"$NR_MODE\",0,\"${nrMode.value}\"")
-        return makeNrMode(getOutput(result, NR_MODE))
-    }
-
-    private fun getOutput(result: Shell.Result, key: String): String {
-        val output = result.out.joinToString("\n").trim()
-        if (!result.isSuccess) throw Exception(getString(R.string.cmdFailed))
-        if (!output.contains("OK")) throw Exception(getString(R.string.resNoOk))
-        val regex = "\"$key\",0,\"(.*)\"".toRegex()
-        val matches = regex.find(output) ?: throw Exception(getString(R.string.resRegexpIssue))
-        val group = matches.groups[1] ?: throw Exception(getString(R.string.resMatchIssue))
-        return group.value
-    }
-
-    private fun runATCommand(nv: String): Shell.Result {
-        val command = "echo 'AT+GOOG$nv\\r' > $MODEM & cat $MODEM"
-        return Shell.cmd(command).exec()
-    }
-
     private fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     companion object {
-        private const val MODEM = "/dev/umts_router"
         private const val NR_MANUAL = "NR.MANUAL.MODE.ENABLE"
         private const val NR_MODE = "NR.CONFIG.MODE"
     }
