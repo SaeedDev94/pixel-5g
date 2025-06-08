@@ -1,6 +1,5 @@
 package io.github.saeeddev94.pixelnr
 
-interface NvEnum<T> {
+interface NvEnum {
     val value: String
-    fun fromValue(value: String): T?
 }

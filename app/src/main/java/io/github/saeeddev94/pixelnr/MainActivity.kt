@@ -40,7 +40,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun resolveNrMode() {
         runCatching {
-            modem.getNv(NR_MODE, NrMode.DISABLED)
+            modem.getNv<NrMode>(NR_MODE)
         }.onSuccess {
             nrMode = it
             binding.nrMode.text = it.label

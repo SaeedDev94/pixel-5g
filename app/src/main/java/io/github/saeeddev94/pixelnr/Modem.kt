@@ -3,22 +3,25 @@ package io.github.saeeddev94.pixelnr
 import android.content.Context
 import com.topjohnwu.superuser.Shell
 
-class Modem(private val context: Context) {
+class Modem(val context: Context) {
 
     @Throws(Exception::class)
-    fun <T> getNv(key: String, nv: NvEnum<T>): T {
+    inline fun <reified T> getNv(key: String): T where T : Enum<T>, T : NvEnum {
         val result = runAtCommand("GETNV=\"$key\"")
-        return getOutput(result, key, nv)
+        return getOutput(result, key)
     }
 
     @Throws(Exception::class)
-    fun <T> setNv(key: String, nv: NvEnum<T>): T {
+    inline fun <reified T> setNv(key: String, nv: T): T where T : Enum<T>, T : NvEnum {
         val result = runAtCommand("SETNV=\"$key\",0,\"${nv.value}\"")
-        return getOutput(result, key, nv)
+        return getOutput(result, key)
     }
 
     @Throws(Exception::class)
-    private fun <T> getOutput(result: Shell.Result, key: String, nv: NvEnum<T>): T {
+    inline fun <reified T> getOutput(
+        result: Shell.Result,
+        key: String
+    ): T where T : Enum<T>, T : NvEnum {
         val output = result.out.joinToString("\n").trim()
         if (!result.isSuccess) throw Exception(context.getString(R.string.cmdFailed))
         if (!output.contains("OK")) throw Exception(context.getString(R.string.resNoOk))
@@ -27,15 +30,13 @@ class Modem(private val context: Context) {
         throw Exception(context.getString(R.string.resRegexpIssue))
         val group = matches.groups[1] ?:
         throw Exception(context.getString(R.string.resMatchIssue))
-        return nv.fromValue(group.value) ?:
+        return enumValues<T>().find { it.value == group.value } ?:
         throw Exception(context.getString(R.string.resInvalidCase))
     }
 
-    companion object {
-        private fun runAtCommand(cmd: String): Shell.Result {
-            val device = "/dev/umts_router"
-            val command = "echo 'AT+GOOG$cmd\\r' > $device & cat $device"
-            return Shell.cmd(command).exec()
-        }
+    fun runAtCommand(cmd: String): Shell.Result {
+        val device = "/dev/umts_router"
+        val command = "echo 'AT+GOOG$cmd\\r' > $device & cat $device"
+        return Shell.cmd(command).exec()
     }
 }
