@@ -27,14 +27,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val value = when (item.itemId) {
+        when (item.itemId) {
             R.id.nrDisabled -> NrMode.DISABLED
             R.id.nrNsa -> NrMode.NSA
             R.id.nrSa -> NrMode.SA
             R.id.nrSaNsa -> NrMode.SA_NAS
             else -> NrMode.DISABLED
-        }
-        nrModeConfirmDialog(value)
+        }.let { nrModeConfirmDialog(it) }
         return true
     }
 
