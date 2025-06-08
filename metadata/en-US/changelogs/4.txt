@@ -1,0 +1,2 @@
+- Some optimizations
+- Target SDK 36 (Android 16)
