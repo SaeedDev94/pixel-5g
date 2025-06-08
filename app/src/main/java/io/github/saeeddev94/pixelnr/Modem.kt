@@ -7,13 +7,13 @@ class Modem(val context: Context) {
 
     @Throws(Exception::class)
     inline fun <reified T> getNv(key: String): T where T : Enum<T>, T : NvEnum {
-        val result = runAtCommand("GETNV=\"$key\"")
+        val result = runCommand("GETNV=\"$key\"")
         return getOutput(result, key)
     }
 
     @Throws(Exception::class)
     inline fun <reified T> setNv(key: String, nv: T): T where T : Enum<T>, T : NvEnum {
-        val result = runAtCommand("SETNV=\"$key\",0,\"${nv.value}\"")
+        val result = runCommand("SETNV=\"$key\",0,\"${nv.value}\"")
         return getOutput(result, key)
     }
 
@@ -34,7 +34,7 @@ class Modem(val context: Context) {
         throw Exception(context.getString(R.string.resInvalidCase))
     }
 
-    fun runAtCommand(cmd: String): Shell.Result {
+    fun runCommand(cmd: String): Shell.Result {
         val device = "/dev/umts_router"
         val command = "echo 'AT+GOOG$cmd\\r' > $device & cat $device"
         return Shell.cmd(command).exec()
