@@ -10,7 +10,7 @@ android {
     defaultConfig {
         applicationId = "io.github.saeeddev94.pixelnr"
         minSdk = 29
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 3
         versionName = "2.0.1"
     }
