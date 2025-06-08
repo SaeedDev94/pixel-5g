@@ -38,31 +38,6 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
-    private fun resolveNrMode() {
-        runCatching {
-            modem.getNv<NrMode>(NR_MODE)
-        }.onSuccess {
-            nrMode = it
-            binding.nrMode.text = it.label
-        }.onFailure {
-            nrModeErrorDialog(it.message ?: "")
-        }
-    }
-
-    private fun nrModeErrorDialog(message: String) {
-        MaterialAlertDialogBuilder(this)
-            .setTitle(getString(R.string.errorDialogTitle))
-            .setMessage(message)
-            .setPositiveButton(getString(R.string.errorDialogReload)) { _, _ ->
-                resolveNrMode()
-            }
-            .setNegativeButton(getString(R.string.errorDialogExit)) { _, _ ->
-                finish()
-            }
-            .setCancelable(false)
-            .show()
-    }
-
     private fun nrModeConfirmDialog(value: NrMode) {
         MaterialAlertDialogBuilder(this)
             .setTitle(getString(R.string.changeNrModeTitle))
@@ -85,6 +60,31 @@ class MainActivity : AppCompatActivity() {
             }
             .setNegativeButton(getString(R.string.cancel)) { _, _ -> }
             .setCancelable(true)
+            .show()
+    }
+
+    private fun resolveNrMode() {
+        runCatching {
+            modem.getNv<NrMode>(NR_MODE)
+        }.onSuccess {
+            nrMode = it
+            binding.nrMode.text = it.label
+        }.onFailure {
+            nrModeErrorDialog(it.message ?: "")
+        }
+    }
+
+    private fun nrModeErrorDialog(message: String) {
+        MaterialAlertDialogBuilder(this)
+            .setTitle(getString(R.string.errorDialogTitle))
+            .setMessage(message)
+            .setPositiveButton(getString(R.string.errorDialogReload)) { _, _ ->
+                resolveNrMode()
+            }
+            .setNegativeButton(getString(R.string.errorDialogExit)) { _, _ ->
+                finish()
+            }
+            .setCancelable(false)
             .show()
     }
 
