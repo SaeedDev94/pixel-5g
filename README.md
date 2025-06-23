@@ -7,6 +7,12 @@ The default NR config is SA only
 
 But with this app and root access you can change the modem NR mode to NSA or event better SA+NSA  
 
+[<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
+     alt="Get it on F-Droid"
+     height="80">](https://f-droid.org/packages/io.github.saeeddev94.pixelnr/)
+
+Or download the latest APK from the [Releases Section](https://github.com/SaeedDev94/pixel-5g/releases/latest).
+
 <img src="metadata/en-US/images/phoneScreenshots/01-NR-SA-DEFAULT.png" height="600" /> <img src="metadata/en-US/images/phoneScreenshots/02-NR-SET-CONFIRM.png" height="600" /> <img src="metadata/en-US/images/phoneScreenshots/03-NR-SA-NSA.png" height="600" />  
 
 This app works only on Pixel with samsung modem (Pixel 6-9)
