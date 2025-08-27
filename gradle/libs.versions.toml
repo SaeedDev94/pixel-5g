@@ -1,6 +1,6 @@
 [versions]
-agp = "8.10.1"
-kotlin = "2.0.21"
+agp = "8.11.1"
+kotlin = "2.2.10"
 androidxAppCompat = "1.7.1"
 googleMaterial = "1.12.0"
 libsuCore = "5.2.2"
