@@ -1,0 +1,2 @@
+- README F-Droid badge by @Poussinou (#3)
+- Adaptive icon by @UjuiUjuMandan (#4)
