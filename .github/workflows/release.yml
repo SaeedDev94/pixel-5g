@@ -28,10 +28,10 @@ jobs:
           echo "${{ secrets.KEY_STORE_FILE }}" > "$KEY_STORE_TXT"
           base64 --decode "$KEY_STORE_TXT" > "$KEY_STORE_JKS"
 
-      - name: JDK 17 Setup
-        uses: actions/setup-java@v4.7.1
+      - name: JDK 21 Setup
+        uses: actions/setup-java@v5
         with:
-          java-version: '17'
+          java-version: '21'
           distribution: 'temurin'
           cache: gradle
 
