@@ -44,11 +44,13 @@ class MainActivity : AppCompatActivity() {
             .setPositiveButton(getString(R.string.yes)) { _, _ ->
                 if (nrMode == value) {
                     showToast(getString(R.string.nrSameMode))
+                    modem.setNv(DS_NR_MODE, value)
                     return@setPositiveButton
                 }
                 runCatching {
                     modem.setNv(NR_MANUAL, NrManual.ENABLED)
                     modem.setNv(NR_MODE, value)
+                    modem.setNv(DS_NR_MODE, value)
                 }.onSuccess {
                     nrMode = it
                     binding.nrMode.text = it.label
@@ -64,6 +66,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun resolveNrMode() {
         runCatching {
+            modem.getNv<NrMode>(DS_NR_MODE)
             modem.getNv<NrMode>(NR_MODE)
         }.onSuccess {
             nrMode = it
@@ -94,5 +97,6 @@ class MainActivity : AppCompatActivity() {
     companion object {
         private const val NR_MANUAL = "NR.MANUAL.MODE.ENABLE"
         private const val NR_MODE = "NR.CONFIG.MODE"
+        private const val DS_NR_MODE = "DS.NR.CONFIG.MODE"
     }
 }
