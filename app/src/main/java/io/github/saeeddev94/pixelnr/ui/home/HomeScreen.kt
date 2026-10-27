@@ -1,4 +1,4 @@
-package io.github.saeeddev94.pixelnr
+package io.github.saeeddev94.pixelnr.ui.home
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,9 +14,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import io.github.saeeddev94.pixelnr.R
+import io.github.saeeddev94.pixelnr.ui.theme.Pixel5GTheme
 
 @Composable
-fun HomeScreen(mode: String?, message: String?, modifier: Modifier = Modifier) {
+fun HomeScreen(
+    state: HomeUiState,
+    modifier: Modifier = Modifier,
+) {
     Column(
         modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -30,11 +35,22 @@ fun HomeScreen(mode: String?, message: String?, modifier: Modifier = Modifier) {
         )
         Text(
             modifier = Modifier.padding(bottom = 16.dp),
-            text = mode ?: stringResource(R.string.nrModeLoading),
+            text = when (state) {
+                HomeUiState.Loading -> stringResource(R.string.nrModeLoading)
+                is HomeUiState.Loaded -> state.mode.label
+                is HomeUiState.Failed -> stringResource(R.string.nrModeError)
+            },
             fontSize = 24.sp,
         )
         Text(
-            text = message ?: "",
+            text = when (state) {
+                is HomeUiState.Loaded -> when (state.rebootRequired) {
+                    true -> stringResource(R.string.rebootDevice)
+                    false -> ""
+                }
+                is HomeUiState.Failed -> "${state.reason}"
+                else -> ""
+            },
             fontSize = 24.sp,
         )
     }
@@ -44,6 +60,6 @@ fun HomeScreen(mode: String?, message: String?, modifier: Modifier = Modifier) {
 @Composable
 private fun HomeScreenPreview() {
     Pixel5GTheme {
-        Surface { HomeScreen(mode = "SA/NSA", message = null) }
+        Surface { HomeScreen(state = HomeUiState.Loading) }
     }
 }

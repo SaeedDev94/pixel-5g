@@ -1,4 +1,4 @@
-package io.github.saeeddev94.pixelnr
+package io.github.saeeddev94.pixelnr.ui.home
 
 import android.app.Application
 import androidx.compose.runtime.getValue
@@ -6,6 +6,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import io.github.saeeddev94.pixelnr.Modem
+import io.github.saeeddev94.pixelnr.NrManual
+import io.github.saeeddev94.pixelnr.NrMode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -16,12 +19,13 @@ import kotlin.time.Duration.Companion.milliseconds
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     private val modem by lazy { Modem(application) }
-    private val context by lazy { getApplication<Application>() }
 
-    var mode by mutableStateOf<String?>(null)
+    var state by mutableStateOf<HomeUiState>(HomeUiState.Loading)
         private set
-    var message by mutableStateOf<String?>(null)
-        private set
+
+    init {
+        resolveNrMode()
+    }
 
     fun resolveNrMode() = viewModelScope.launch(Dispatchers.IO) {
         run loop@ {
@@ -32,15 +36,13 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                     modem.getNv<NrMode>(DS_NR_MODE)
                 }.onSuccess {
                     withContext(Dispatchers.Main) {
-                        mode = it.label
-                        message = null
+                        state = HomeUiState.Loaded(mode = it, rebootRequired = false)
                     }
                     return@loop
                 }.onFailure {
                     if (!isLast) return@onFailure
                     withContext(Dispatchers.Main) {
-                        mode = context.getString(R.string.nrModeError)
-                        message = "${it.message}"
+                        state = HomeUiState.Failed(reason = it.message)
                     }
                     return@loop
                 }
@@ -52,8 +54,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     fun changeNrMode(value: NrMode) = viewModelScope.launch(Dispatchers.IO) {
         run loop@ {
             withContext(Dispatchers.Main) {
-                mode = null
-                message = null
+                state = HomeUiState.Loading
             }
             repeat(MAX_RETRIES) { index ->
                 val isLast = (index + 1) == MAX_RETRIES
@@ -64,15 +65,13 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                     modem.setNv(DS_NR_MODE, value)
                 }.onSuccess {
                     withContext(Dispatchers.Main) {
-                        mode = value.label
-                        message = context.getString(R.string.rebootDevice)
+                        state = HomeUiState.Loaded(mode = value, rebootRequired = true)
                     }
                     return@loop
                 }.onFailure {
                     if (!isLast) return@onFailure
                     withContext(Dispatchers.Main) {
-                        mode = context.getString(R.string.nrModeError)
-                        message = "${it.message}"
+                        state = HomeUiState.Failed(reason = it.message)
                     }
                     return@loop
                 }

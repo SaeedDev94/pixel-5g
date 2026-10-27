@@ -10,13 +10,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlinx.coroutines.Job
+import io.github.saeeddev94.pixelnr.ui.home.HomeScreen
+import io.github.saeeddev94.pixelnr.ui.home.HomeViewModel
+import io.github.saeeddev94.pixelnr.ui.theme.Pixel5GTheme
 
 class MainActivity : AppCompatActivity() {
 
     private val homeViewModel: HomeViewModel by viewModels()
-
-    private var resolveJob: Job? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,24 +24,11 @@ class MainActivity : AppCompatActivity() {
             Pixel5GTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
                     HomeScreen(
-                        mode = homeViewModel.mode,
-                        message = homeViewModel.message,
+                        state = homeViewModel.state,
                     )
                 }
             }
         }
-    }
-
-    override fun onStart() {
-        super.onStart()
-        if (homeViewModel.mode == null) {
-            resolveJob = homeViewModel.resolveNrMode()
-        }
-    }
-
-    override fun onStop() {
-        resolveJob?.cancel()
-        super.onStop()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
