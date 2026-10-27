@@ -4,20 +4,32 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
+import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import io.github.saeeddev94.pixelnr.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityMainBinding
     private var modem = Modem(this)
     private var nrMode: NrMode? = null
+    private var nrModeText by mutableStateOf("")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        nrModeText = getString(R.string.nrModeLoading)
+        setContent {
+            Pixel5GTheme {
+                Surface(modifier = Modifier.fillMaxSize()) {
+                    HomeScreen(nrMode = nrModeText)
+                }
+            }
+        }
         resolveNrMode()
     }
 
@@ -53,7 +65,7 @@ class MainActivity : AppCompatActivity() {
                     modem.setNv(DS_NR_MODE, value)
                 }.onSuccess {
                     nrMode = it
-                    binding.nrMode.text = it.label
+                    nrModeText = it.label
                     showToast(getString(R.string.rebootDevice))
                 }.onFailure {
                     showToast(it.message ?: "")
@@ -70,7 +82,7 @@ class MainActivity : AppCompatActivity() {
             modem.getNv<NrMode>(NR_MODE)
         }.onSuccess {
             nrMode = it
-            binding.nrMode.text = it.label
+            nrModeText = it.label
         }.onFailure {
             nrModeErrorDialog(it.message ?: "")
         }
