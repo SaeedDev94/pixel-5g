@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun HomeScreen(nrMode: String, modifier: Modifier = Modifier) {
+fun HomeScreen(mode: String?, message: String?, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -29,7 +29,12 @@ fun HomeScreen(nrMode: String, modifier: Modifier = Modifier) {
             fontWeight = FontWeight.Bold,
         )
         Text(
-            text = nrMode,
+            modifier = Modifier.padding(bottom = 16.dp),
+            text = mode ?: stringResource(R.string.nrModeLoading),
+            fontSize = 24.sp,
+        )
+        Text(
+            text = message ?: "",
             fontSize = 24.sp,
         )
     }
@@ -39,6 +44,6 @@ fun HomeScreen(nrMode: String, modifier: Modifier = Modifier) {
 @Composable
 private fun HomeScreenPreview() {
     Pixel5GTheme {
-        Surface { HomeScreen(nrMode = "SA/NSA") }
+        Surface { HomeScreen(mode = "SA/NSA", message = null) }
     }
 }

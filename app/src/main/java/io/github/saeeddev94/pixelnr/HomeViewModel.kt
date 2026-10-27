@@ -18,20 +18,29 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private val modem by lazy { Modem(application) }
     private val context by lazy { getApplication<Application>() }
 
-    var nrMode by mutableStateOf<NrMode?>(null)
+    var mode by mutableStateOf<String?>(null)
         private set
     var message by mutableStateOf<String?>(null)
         private set
 
     fun resolveNrMode() = viewModelScope.launch(Dispatchers.IO) {
         run loop@ {
-            repeat (MAX_RETRIES) {
+            repeat (MAX_RETRIES) { index ->
+                val isLast = (index + 1) == MAX_RETRIES
                 if (!isActive) return@loop
                 runCatching {
                     modem.getNv<NrMode>(DS_NR_MODE)
                 }.onSuccess {
                     withContext(Dispatchers.Main) {
-                        nrMode = it
+                        mode = it.label
+                        message = null
+                    }
+                    return@loop
+                }.onFailure {
+                    if (!isLast) return@onFailure
+                    withContext(Dispatchers.Main) {
+                        mode = context.getString(R.string.nrModeError)
+                        message = "${it.message}"
                     }
                     return@loop
                 }
@@ -42,6 +51,10 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     fun changeNrMode(value: NrMode) = viewModelScope.launch(Dispatchers.IO) {
         run loop@ {
+            withContext(Dispatchers.Main) {
+                mode = null
+                message = null
+            }
             repeat(MAX_RETRIES) { index ->
                 val isLast = (index + 1) == MAX_RETRIES
                 if (!isActive) return@loop
@@ -51,13 +64,14 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                     modem.setNv(DS_NR_MODE, value)
                 }.onSuccess {
                     withContext(Dispatchers.Main) {
-                        nrMode = value
+                        mode = value.label
                         message = context.getString(R.string.rebootDevice)
                     }
                     return@loop
                 }.onFailure {
                     if (!isLast) return@onFailure
                     withContext(Dispatchers.Main) {
+                        mode = context.getString(R.string.nrModeError)
                         message = "${it.message}"
                     }
                     return@loop
@@ -65,10 +79,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 delay(TIMEOUT.milliseconds)
             }
         }
-    }
-
-    fun messageShown() {
-        message = null
     }
 
     companion object {

@@ -3,16 +3,12 @@ package io.github.saeeddev94.pixelnr
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Job
 
@@ -25,19 +21,11 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val context = LocalContext.current
-            homeViewModel.message?.let { text ->
-                LaunchedEffect(text) {
-                    Toast.makeText(
-                        context, text, Toast.LENGTH_SHORT,
-                    ).show()
-                    homeViewModel.messageShown()
-                }
-            }
             Pixel5GTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
                     HomeScreen(
-                        nrMode = homeViewModel.nrMode?.label ?: stringResource(R.string.nrModeLoading),
+                        mode = homeViewModel.mode,
+                        message = homeViewModel.message,
                     )
                 }
             }
@@ -46,7 +34,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        if (homeViewModel.nrMode == null) {
+        if (homeViewModel.mode == null) {
             resolveJob = homeViewModel.resolveNrMode()
         }
     }
