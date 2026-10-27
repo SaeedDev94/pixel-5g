@@ -9,7 +9,9 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Job
@@ -19,11 +21,19 @@ class MainActivity : AppCompatActivity() {
     private val homeViewModel: HomeViewModel by viewModels()
 
     private var resolveJob: Job? = null
-    private var changeJob: Job? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            val context = LocalContext.current
+            homeViewModel.message?.let { text ->
+                LaunchedEffect(text) {
+                    Toast.makeText(
+                        context, text, Toast.LENGTH_SHORT,
+                    ).show()
+                    homeViewModel.messageShown()
+                }
+            }
             Pixel5GTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
                     HomeScreen(
@@ -36,12 +46,13 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        resolveJob = homeViewModel.resolveNrMode()
+        if (homeViewModel.nrMode == null) {
+            resolveJob = homeViewModel.resolveNrMode()
+        }
     }
 
     override fun onStop() {
         resolveJob?.cancel()
-        changeJob?.cancel()
         super.onStop()
     }
 
@@ -66,17 +77,7 @@ class MainActivity : AppCompatActivity() {
             .setTitle(getString(R.string.changeNrModeTitle))
             .setMessage(getString(R.string.changeNrModeMessage, value.label))
             .setPositiveButton(getString(R.string.yes)) { _, _ ->
-                changeJob?.cancel()
-                changeJob = homeViewModel.changeNrMode(value) { err ->
-                    when (err) {
-                        null -> getString(R.string.rebootDevice)
-                        else -> "${err.message}"
-                    }.let { text ->
-                        Toast.makeText(
-                            applicationContext, text, Toast.LENGTH_SHORT,
-                        ).show()
-                    }
-                }
+                homeViewModel.changeNrMode(value)
             }
             .setNegativeButton(getString(R.string.cancel)) { _, _ -> }
             .setCancelable(true)

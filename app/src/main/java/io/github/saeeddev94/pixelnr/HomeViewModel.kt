@@ -16,8 +16,11 @@ import kotlin.time.Duration.Companion.milliseconds
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     private val modem by lazy { Modem(application) }
+    private val context by lazy { getApplication<Application>() }
 
     var nrMode by mutableStateOf<NrMode?>(null)
+        private set
+    var message by mutableStateOf<String?>(null)
         private set
 
     fun resolveNrMode() = viewModelScope.launch(Dispatchers.IO) {
@@ -37,19 +40,11 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun changeNrMode(
-        value: NrMode,
-        cb: (err: Throwable?) -> Unit,
-    ) = viewModelScope.launch(Dispatchers.IO) {
+    fun changeNrMode(value: NrMode) = viewModelScope.launch(Dispatchers.IO) {
         run loop@ {
             repeat(MAX_RETRIES) { index ->
                 val isLast = (index + 1) == MAX_RETRIES
-                if (!isActive) {
-                    withContext(Dispatchers.Main) {
-                        cb(Exception("Dead Job"))
-                    }
-                    return@loop
-                }
+                if (!isActive) return@loop
                 runCatching {
                     modem.setNv(NR_MANUAL, NrManual.ENABLED)
                     modem.setNv(NR_MODE, value)
@@ -57,19 +52,23 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 }.onSuccess {
                     withContext(Dispatchers.Main) {
                         nrMode = value
-                        cb(null)
+                        message = context.getString(R.string.rebootDevice)
                     }
                     return@loop
                 }.onFailure {
                     if (!isLast) return@onFailure
                     withContext(Dispatchers.Main) {
-                        cb(it)
+                        message = "${it.message}"
                     }
                     return@loop
                 }
                 delay(TIMEOUT.milliseconds)
             }
         }
+    }
+
+    fun messageShown() {
+        message = null
     }
 
     companion object {
