@@ -3,7 +3,9 @@ package io.github.saeeddev94.pixelnr
 import android.content.Context
 import com.topjohnwu.superuser.Shell
 
-class Modem(val context: Context) {
+class Modem(val context: Context) : AutoCloseable {
+
+    private lateinit var shell: Shell
 
     @Throws(Exception::class)
     inline fun <reified T> getNv(key: String): T where T : Enum<T>, T : NvEnum {
@@ -34,9 +36,27 @@ class Modem(val context: Context) {
         throw Exception(context.getString(R.string.resInvalidCase))
     }
 
+    @Throws(Exception::class)
     fun runCommand(cmd: String): Shell.Result {
+        shell = getShell()
+        if (!shell.isRoot) throw Exception(context.getString(R.string.rootIsRequired))
         val device = "/dev/umts_router"
         val command = "echo 'AT+GOOG$cmd\\r' > $device & cat $device"
-        return Shell.cmd(command).exec()
+        val stdout = ArrayList<String>()
+        val stderr = ArrayList<String>()
+        return shell.newJob()
+            .add(command)
+            .to(stdout, stderr)
+            .exec()
+    }
+
+    private fun getShell(): Shell {
+        if (::shell.isInitialized && shell.isRoot) return shell
+        close()
+        return Shell.Builder.create().build()
+    }
+
+    override fun close() {
+        if (::shell.isInitialized) shell.close()
     }
 }

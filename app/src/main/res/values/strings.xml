@@ -8,6 +8,7 @@
     <string name="nrModeLabel">NR Mode</string>
     <string name="nrModeLoading">Loading</string>
     <string name="nrModeError">Error!</string>
+    <string name="rootIsRequired">Root is required!</string>
     <string name="cmdFailed">Command Failed!</string>
     <string name="resNoOk">No OK!</string>
     <string name="resRegexpIssue">Regexp Issue!</string>
