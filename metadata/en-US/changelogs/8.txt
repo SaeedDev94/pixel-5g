@@ -1,0 +1,4 @@
+- New UI built with Jetpack Compose
+- Material You: colors follow your wallpaper, light and dark mode
+- Clear "Root is required!" message when root access is missing
+- Requires Android 12 or newer

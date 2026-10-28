@@ -13,8 +13,8 @@ android {
         applicationId = "io.github.saeeddev94.pixelnr"
         minSdk = 31
         targetSdk = 37
-        versionCode = 7
-        versionName = "2.1.2"
+        versionCode = 8
+        versionName = "2.2.0"
     }
 
     compileOptions {
