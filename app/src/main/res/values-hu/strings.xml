@@ -1,12 +1,9 @@
 <resources>
     <string name="appName">Pixel 5G</string>
-    <string name="nrDisabled">Kikapcsolva</string>
-    <string name="nrNsa">NSA</string>
-    <string name="nrSa">SA</string>
-    <string name="nrSaNsa">SA+NSA</string>
-    <string name="nrSameMode">Ez a mód van most beállítva!</string>
     <string name="nrModeLabel">NR mód</string>
     <string name="nrModeLoading">Betöltés</string>
+    <string name="nrModeError">Hiba!</string>
+    <string name="rootIsRequired">Root jogosultság szükséges!</string>
     <string name="cmdFailed">Parancs végrehajtása sikertelen!</string>
     <string name="resNoOk">Nincs OK!</string>
     <string name="resRegexpIssue">Regexp probléma!</string>

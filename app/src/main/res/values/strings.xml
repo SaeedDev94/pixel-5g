@@ -1,10 +1,5 @@
 <resources>
     <string name="appName">Pixel 5G</string>
-    <string name="nrDisabled">Disabled</string>
-    <string name="nrNsa">NSA</string>
-    <string name="nrSa">SA</string>
-    <string name="nrSaNsa">SA+NSA</string>
-    <string name="nrSameMode">The mode is already set!</string>
     <string name="nrModeLabel">NR Mode</string>
     <string name="nrModeLoading">Loading</string>
     <string name="nrModeError">Error!</string>
@@ -14,9 +9,6 @@
     <string name="resRegexpIssue">Regexp Issue!</string>
     <string name="resMatchIssue">Match Issue!</string>
     <string name="resInvalidCase">Invalid Case!</string>
-    <string name="errorDialogTitle">Error</string>
-    <string name="errorDialogReload">Reload</string>
-    <string name="errorDialogExit">Exit</string>
     <string name="changeNrModeTitle">Change NR Mode?</string>
     <string name="changeNrModeMessage">Set NR Mode to \"%1$s\" ?</string>
     <string name="yes">Yes</string>
