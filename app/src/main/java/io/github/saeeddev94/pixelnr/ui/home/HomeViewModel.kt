@@ -13,11 +13,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlin.time.Duration.Companion.milliseconds
 
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
+    private val mutex = Mutex()
     private val modem = Modem(application).also {
         addCloseable(it)
     }
@@ -29,55 +32,69 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         resolveNrMode()
     }
 
-    fun resolveNrMode() = viewModelScope.launch(Dispatchers.IO) {
-        run loop@ {
-            repeat (MAX_RETRIES) { index ->
-                val isLast = (index + 1) == MAX_RETRIES
-                if (!isActive) return@loop
-                runCatching {
-                    modem.getNv<NrMode>(DS_NR_MODE)
-                }.onSuccess {
-                    withContext(Dispatchers.Main) {
-                        state = HomeUiState.Loaded(mode = it, rebootRequired = false)
+    fun resolveNrMode() {
+        viewModelScope.launch(Dispatchers.IO) {
+            mutex.withLock {
+                run loop@ {
+                    repeat (MAX_RETRIES) { index ->
+                        val isLast = (index + 1) == MAX_RETRIES
+                        if (!isActive) return@loop
+                        runCatching {
+                            modem.getNv<NrMode>(DS_NR_MODE)
+                        }.onSuccess {
+                            withContext(Dispatchers.Main) {
+                                state = HomeUiState.Loaded(
+                                    mode = it,
+                                    rebootRequired = false,
+                                )
+                            }
+                            return@loop
+                        }.onFailure {
+                            if (!isLast) return@onFailure
+                            withContext(Dispatchers.Main) {
+                                state = HomeUiState.Failed(reason = it.message)
+                            }
+                            return@loop
+                        }
+                        delay(TIMEOUT.milliseconds)
                     }
-                    return@loop
-                }.onFailure {
-                    if (!isLast) return@onFailure
-                    withContext(Dispatchers.Main) {
-                        state = HomeUiState.Failed(reason = it.message)
-                    }
-                    return@loop
                 }
-                delay(TIMEOUT.milliseconds)
             }
         }
     }
 
-    fun changeNrMode(value: NrMode) = viewModelScope.launch(Dispatchers.IO) {
-        run loop@ {
-            withContext(Dispatchers.Main) {
-                state = HomeUiState.Loading
-            }
-            repeat(MAX_RETRIES) { index ->
-                val isLast = (index + 1) == MAX_RETRIES
-                if (!isActive) return@loop
-                runCatching {
-                    modem.setNv(NR_MANUAL, NrManual.ENABLED)
-                    modem.setNv(NR_MODE, value)
-                    modem.setNv(DS_NR_MODE, value)
-                }.onSuccess {
+    fun changeNrMode(value: NrMode) {
+        viewModelScope.launch(Dispatchers.IO) {
+            mutex.withLock {
+                run loop@ {
                     withContext(Dispatchers.Main) {
-                        state = HomeUiState.Loaded(mode = value, rebootRequired = true)
+                        state = HomeUiState.Loading
                     }
-                    return@loop
-                }.onFailure {
-                    if (!isLast) return@onFailure
-                    withContext(Dispatchers.Main) {
-                        state = HomeUiState.Failed(reason = it.message)
+                    repeat(MAX_RETRIES) { index ->
+                        val isLast = (index + 1) == MAX_RETRIES
+                        if (!isActive) return@loop
+                        runCatching {
+                            modem.setNv(NR_MANUAL, NrManual.ENABLED)
+                            modem.setNv(NR_MODE, value)
+                            modem.setNv(DS_NR_MODE, value)
+                        }.onSuccess {
+                            withContext(Dispatchers.Main) {
+                                state = HomeUiState.Loaded(
+                                    mode = value,
+                                    rebootRequired = true,
+                                )
+                            }
+                            return@loop
+                        }.onFailure {
+                            if (!isLast) return@onFailure
+                            withContext(Dispatchers.Main) {
+                                state = HomeUiState.Failed(reason = it.message)
+                            }
+                            return@loop
+                        }
+                        delay(TIMEOUT.milliseconds)
                     }
-                    return@loop
                 }
-                delay(TIMEOUT.milliseconds)
             }
         }
     }
