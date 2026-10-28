@@ -12,6 +12,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -28,7 +29,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import io.github.saeeddev94.pixelnr.NrMode
 import io.github.saeeddev94.pixelnr.R
 import io.github.saeeddev94.pixelnr.ui.theme.Pixel5GTheme
@@ -45,7 +45,9 @@ fun HomeScreen(
 
     selectedMode?.let { mode ->
         AlertDialog(
-            title = { Text(stringResource(R.string.changeNrModeTitle)) },
+            title = {
+                Text(stringResource(R.string.changeNrModeTitle))
+            },
             text = {
                 Text(stringResource(R.string.changeNrModeMessage, mode.label))
             },
@@ -107,7 +109,7 @@ fun HomeScreen(
             Text(
                 modifier = Modifier.padding(bottom = 16.dp),
                 text = stringResource(R.string.nrModeLabel),
-                fontSize = 32.sp,
+                style = MaterialTheme.typography.headlineLarge,
                 fontWeight = FontWeight.Bold,
             )
             Text(
@@ -117,7 +119,7 @@ fun HomeScreen(
                     is HomeUiState.Loaded -> state.mode.label
                     is HomeUiState.Failed -> stringResource(R.string.nrModeError)
                 },
-                fontSize = 24.sp,
+                style = MaterialTheme.typography.headlineSmall
             )
             Text(
                 text = when (state) {
@@ -128,7 +130,7 @@ fun HomeScreen(
                     is HomeUiState.Failed -> "${state.reason}"
                     else -> ""
                 },
-                fontSize = 24.sp,
+                style = MaterialTheme.typography.bodyLarge
             )
         }
     }
