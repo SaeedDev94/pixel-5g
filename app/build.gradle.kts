@@ -61,7 +61,5 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
 
     implementation(libs.androidx.activity.compose)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.google.material)
     implementation(libs.topjohnwu.libsu.core)
 }
