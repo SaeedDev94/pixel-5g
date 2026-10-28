@@ -18,7 +18,9 @@ import kotlin.time.Duration.Companion.milliseconds
 
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val modem by lazy { Modem(application) }
+    private val modem = Modem(application).also {
+        addCloseable(it)
+    }
 
     var state by mutableStateOf<HomeUiState>(HomeUiState.Loading)
         private set
