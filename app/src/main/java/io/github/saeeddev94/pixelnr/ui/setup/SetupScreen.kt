@@ -17,9 +17,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.github.saeeddev94.pixelnr.R
 import io.github.saeeddev94.pixelnr.ui.main.MainUiState
+import io.github.saeeddev94.pixelnr.ui.theme.Pixel5GTheme
 
 @Composable
 fun SetupScreen(
@@ -92,5 +94,19 @@ fun SetupScreen(
                 total = slides.size,
             )
         }
+    }
+}
+
+@Preview
+@Composable
+private fun SetupScreenNothingGrantedPreview() {
+    Pixel5GTheme {
+        SetupScreen(
+            state = MainUiState.Setup(rootGranted = false, phoneStateGranted = false),
+            showRootDialog = false,
+            onDismissRootDialog = {},
+            onRequestRoot = {},
+            onRequestPhoneState = {},
+        )
     }
 }
