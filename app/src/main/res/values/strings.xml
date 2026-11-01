@@ -1,5 +1,10 @@
 <resources>
     <string name="appName">Pixel 5G</string>
+    <string name="setupRootTitle">Root access</string>
+    <string name="setupRootDescription">Required to config modem settings</string>
+    <string name="setupPhoneStateTitle">Read phone state</string>
+    <string name="setupPhoneStateDescription">Required to get sim cards list</string>
+    <string name="setupGrantAccess">Grant Access</string>
     <string name="nrModeLabel">NR Mode</string>
     <string name="nrModeLoading">Loading</string>
     <string name="nrModeError">Error!</string>

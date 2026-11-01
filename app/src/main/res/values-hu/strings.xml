@@ -1,5 +1,10 @@
 <resources>
     <string name="appName">Pixel 5G</string>
+    <string name="setupRootTitle">Root jogosultság</string>
+    <string name="setupRootDescription">A modem beállításainak módosításához szükséges</string>
+    <string name="setupPhoneStateTitle">Telefonállapot olvasása</string>
+    <string name="setupPhoneStateDescription">A SIM-kártyák listájának lekéréséhez szükséges</string>
+    <string name="setupGrantAccess">Hozzáférés engedélyezése</string>
     <string name="nrModeLabel">NR mód</string>
     <string name="nrModeLoading">Betöltés</string>
     <string name="nrModeError">Hiba!</string>
