@@ -10,6 +10,12 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.activity.viewModels
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import io.github.saeeddev94.pixelnr.ui.home.HomeScreen
 import io.github.saeeddev94.pixelnr.ui.home.HomeViewModel
 import io.github.saeeddev94.pixelnr.ui.main.MainUiState
@@ -37,6 +43,12 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             Pixel5GTheme {
+                var showRootDialog by remember { mutableStateOf(false) }
+
+                LifecycleEventEffect(Lifecycle.Event.ON_STOP) {
+                    showRootDialog = false
+                }
+
                 when (val state = mainViewModel.state) {
                     MainUiState.Checking -> Unit
                     MainUiState.Ready -> HomeScreen(
@@ -45,8 +57,13 @@ class MainActivity : ComponentActivity() {
                     )
                     is MainUiState.Setup -> SetupScreen(
                         state = state,
+                        showRootDialog = showRootDialog,
+                        onDismissRootDialog = { showRootDialog = false },
                         onRequestRoot = {
-                            mainViewModel.refresh()
+                            mainViewModel.refresh { isRoot ->
+                                if (isRoot) return@refresh
+                                showRootDialog = true
+                            }
                         },
                         onRequestPhoneState = {
                             phoneStateLauncher.launch(Manifest.permission.READ_PHONE_STATE)

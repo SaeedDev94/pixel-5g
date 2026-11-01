@@ -8,11 +8,15 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.SimCard
 import androidx.compose.material.icons.filled.Tag
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import io.github.saeeddev94.pixelnr.R
 import io.github.saeeddev94.pixelnr.ui.main.MainUiState
@@ -20,10 +24,25 @@ import io.github.saeeddev94.pixelnr.ui.main.MainUiState
 @Composable
 fun SetupScreen(
     state: MainUiState.Setup,
+    showRootDialog: Boolean,
+    onDismissRootDialog: () -> Unit,
     onRequestRoot: () -> Unit,
     onRequestPhoneState: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    if (showRootDialog) {
+        AlertDialog(
+            title = { Text(stringResource(R.string.setupRootDialogTitle)) },
+            text = { Text(stringResource(R.string.setupRootDialogMessage)) },
+            confirmButton = {
+                TextButton(onClick = onDismissRootDialog) {
+                    Text(stringResource(R.string.ok))
+                }
+            },
+            onDismissRequest = onDismissRootDialog,
+        )
+    }
+
     val slides = listOf(
         SetupSlide(
             icon = Icons.Default.Tag,

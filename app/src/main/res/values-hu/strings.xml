@@ -5,6 +5,8 @@
     <string name="setupPhoneStateTitle">Telefonállapot olvasása</string>
     <string name="setupPhoneStateDescription">A SIM-kártyák listájának lekéréséhez szükséges</string>
     <string name="setupGrantAccess">Hozzáférés engedélyezése</string>
+    <string name="setupRootDialogTitle">Root jogosultság engedélyezése</string>
+    <string name="setupRootDialogMessage">A root kezelő nem jelenített meg kérést. Nyissa meg (Magisk, KernelSU…), engedélyezze a Pixel 5G alkalmazást a Superuser listában, majd térjen vissza.</string>
     <string name="nrModeLabel">NR mód</string>
     <string name="nrModeLoading">Betöltés</string>
     <string name="nrModeError">Hiba!</string>
@@ -18,5 +20,6 @@
     <string name="changeNrModeMessage">Biztos átállítja az NR módot erre: \"%1$s\" ?</string>
     <string name="yes">Igen</string>
     <string name="cancel">Mégsem</string>
+    <string name="ok">OK</string>
     <string name="rebootDevice">Most indítsa újra az eszközt!</string>
 </resources>

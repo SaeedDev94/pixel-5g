@@ -23,7 +23,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     var state by mutableStateOf<MainUiState>(MainUiState.Checking)
         private set
 
-    fun refresh() {
+    fun refresh(isRoot: (value: Boolean) -> Unit = {}) {
         viewModelScope.launch(Dispatchers.IO) {
             val rootGranted = root.isRoot()
             val phoneStateGranted = context.checkSelfPermission(
@@ -35,6 +35,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     true -> MainUiState.Ready
                     false -> MainUiState.Setup(rootGranted, phoneStateGranted)
                 }
+                isRoot(rootGranted)
             }
         }
     }
