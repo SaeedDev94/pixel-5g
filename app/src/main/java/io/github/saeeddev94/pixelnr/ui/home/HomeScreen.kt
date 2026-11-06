@@ -102,9 +102,9 @@ fun HomeScreen(
             )
         },
         bottomBar = {
-            if (sims.isNullOrEmpty()) return@Scaffold
+            if (sims?.isEmpty() == true) return@Scaffold
             NavigationBar {
-                sims.forEachIndexed { index, sim ->
+                sims?.forEachIndexed { index, sim ->
                     NavigationBarItem(
                         selected = index == selectedTab,
                         onClick = { selectedTab = index },
