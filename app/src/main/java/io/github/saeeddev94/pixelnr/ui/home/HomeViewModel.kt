@@ -1,6 +1,9 @@
 package io.github.saeeddev94.pixelnr.ui.home
 
+import android.Manifest
 import android.app.Application
+import android.telephony.SubscriptionManager
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -9,6 +12,7 @@ import androidx.lifecycle.viewModelScope
 import io.github.saeeddev94.pixelnr.Modem
 import io.github.saeeddev94.pixelnr.NrManual
 import io.github.saeeddev94.pixelnr.NrMode
+import io.github.saeeddev94.pixelnr.extensions.hasPermission
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -20,19 +24,77 @@ import kotlin.time.Duration.Companion.milliseconds
 
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
+    private val context by lazy { application.applicationContext }
+    private val subscriptionManager by lazy {
+        context.getSystemService(SubscriptionManager::class.java)
+    }
+
     private val mutex = Mutex()
-    private val modem = Modem(application).also {
+    private val modem = Modem(context).also {
         addCloseable(it)
     }
 
-    var state by mutableStateOf<HomeUiState>(HomeUiState.Loading)
+    var sims by mutableStateOf<List<Sim>?>(null)
         private set
 
     init {
-        resolveNrMode()
+        resolveActiveSims {
+            this@HomeViewModel.sims?.forEach { sim ->
+                resolveNrMode(sim)
+            }
+        }
     }
 
-    fun resolveNrMode() {
+    fun changeNrMode(sim: Sim, value: NrMode) {
+        viewModelScope.launch(Dispatchers.IO) {
+            mutex.withLock {
+                run loop@ {
+                    withContext(Dispatchers.Main) {
+                        updateSim(
+                            sim,
+                            HomeUiState.Loading,
+                        )
+                    }
+                    repeat(MAX_RETRIES) { index ->
+                        val isLast = (index + 1) == MAX_RETRIES
+                        if (!isActive) return@loop
+                        runCatching {
+                            modem.setNv(NR_MANUAL, NrManual.ENABLED)
+                            when (sim.index) {
+                                0 -> modem.setNv(NR_MODE, value)
+                                else -> modem.setNv(DS_NR_MODE, value)
+                            }
+                        }.onSuccess {
+                            withContext(Dispatchers.Main) {
+                                updateSim(
+                                    sim,
+                                    HomeUiState.Loaded(
+                                        mode = value,
+                                        rebootRequired = true,
+                                    ),
+                                )
+                            }
+                            return@loop
+                        }.onFailure {
+                            if (!isLast) return@onFailure
+                            withContext(Dispatchers.Main) {
+                                updateSim(
+                                    sim,
+                                    HomeUiState.Failed(
+                                        reason = it.message,
+                                    ),
+                                )
+                            }
+                            return@loop
+                        }
+                        delay(TIMEOUT.milliseconds)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun resolveNrMode(sim: Sim) {
         viewModelScope.launch(Dispatchers.IO) {
             mutex.withLock {
                 run loop@ {
@@ -40,19 +102,30 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                         val isLast = (index + 1) == MAX_RETRIES
                         if (!isActive) return@loop
                         runCatching {
-                            modem.getNv<NrMode>(DS_NR_MODE)
+                            when (sim.index) {
+                                0 -> NR_MODE
+                                else -> DS_NR_MODE
+                            }.let { key ->
+                                modem.getNv<NrMode>(key)
+                            }
                         }.onSuccess {
                             withContext(Dispatchers.Main) {
-                                state = HomeUiState.Loaded(
-                                    mode = it,
-                                    rebootRequired = false,
+                                updateSim(
+                                    sim,
+                                    HomeUiState.Loaded(
+                                        mode = it,
+                                        rebootRequired = false,
+                                    ),
                                 )
                             }
                             return@loop
                         }.onFailure {
                             if (!isLast) return@onFailure
                             withContext(Dispatchers.Main) {
-                                state = HomeUiState.Failed(reason = it.message)
+                                updateSim(
+                                    sim,
+                                    HomeUiState.Failed(reason = it.message),
+                                )
                             }
                             return@loop
                         }
@@ -63,40 +136,37 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun changeNrMode(value: NrMode) {
+    private fun resolveActiveSims(done: () -> Unit) {
+        if (!context.hasPermission(Manifest.permission.READ_PHONE_STATE)) {
+            Log.e(TAG, "resolveActiveSims: Missing READ_PHONE_STATE permission")
+            sims = emptyList()
+            return
+        }
         viewModelScope.launch(Dispatchers.IO) {
-            mutex.withLock {
-                run loop@ {
-                    withContext(Dispatchers.Main) {
-                        state = HomeUiState.Loading
-                    }
-                    repeat(MAX_RETRIES) { index ->
-                        val isLast = (index + 1) == MAX_RETRIES
-                        if (!isActive) return@loop
-                        runCatching {
-                            modem.setNv(NR_MANUAL, NrManual.ENABLED)
-                            modem.setNv(NR_MODE, value)
-                            modem.setNv(DS_NR_MODE, value)
-                        }.onSuccess {
-                            withContext(Dispatchers.Main) {
-                                state = HomeUiState.Loaded(
-                                    mode = value,
-                                    rebootRequired = true,
-                                )
-                            }
-                            return@loop
-                        }.onFailure {
-                            if (!isLast) return@onFailure
-                            withContext(Dispatchers.Main) {
-                                state = HomeUiState.Failed(reason = it.message)
-                            }
-                            return@loop
-                        }
-                        delay(TIMEOUT.milliseconds)
-                    }
+            @Suppress("MissingPermission")
+            val sims = runCatching {
+                subscriptionManager.activeSubscriptionInfoList
+            }.onFailure {
+                Log.e(TAG, "activeSubscriptionInfoList: ${it.message}")
+            }.getOrNull()
+                .orEmpty()
+                .sortedBy { it.simSlotIndex }
+                .map {
+                    Sim(it.simSlotIndex, it.subscriptionId, "${it.displayName}")
                 }
+            withContext(Dispatchers.Main) {
+                this@HomeViewModel.sims = sims
+                done()
             }
         }
+    }
+
+    private fun updateSim(sim: Sim, state: HomeUiState) {
+        val list = sims?.toMutableList() ?: return
+        val index = list.indexOfFirst { sim.id == it.id }
+        if (index == -1) return
+        list[index] = list[index].copy(state = state)
+        sims = list.toList()
     }
 
     companion object {
@@ -105,5 +175,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         private const val NR_MANUAL = "NR.MANUAL.MODE.ENABLE"
         private const val NR_MODE = "NR.CONFIG.MODE"
         private const val DS_NR_MODE = "DS.NR.CONFIG.MODE"
+        private const val TAG = "HomeViewModel"
     }
 }

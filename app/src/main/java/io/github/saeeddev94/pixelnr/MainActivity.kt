@@ -52,8 +52,10 @@ class MainActivity : ComponentActivity() {
                 when (val state = mainViewModel.state) {
                     MainUiState.Checking -> Unit
                     MainUiState.Ready -> HomeScreen(
-                        state = homeViewModel.state,
-                        onChangeMode = { homeViewModel.changeNrMode(it) },
+                        sims = homeViewModel.sims,
+                        onChangeMode = { sim, value ->
+                            homeViewModel.changeNrMode(sim, value)
+                        },
                     )
                     is MainUiState.Setup -> SetupScreen(
                         state = state,

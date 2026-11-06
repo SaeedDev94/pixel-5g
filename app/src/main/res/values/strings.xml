@@ -17,9 +17,10 @@
     <string name="resMatchIssue">Match Issue!</string>
     <string name="resInvalidCase">Invalid Case!</string>
     <string name="changeNrModeTitle">Change NR Mode?</string>
-    <string name="changeNrModeMessage">Set NR Mode to \"%1$s\" ?</string>
+    <string name="changeNrModeMessage">Set \"%1$s\" NR Mode to \"%2$s\" ?</string>
     <string name="yes">Yes</string>
     <string name="cancel">Cancel</string>
     <string name="ok">OK</string>
     <string name="rebootDevice">Reboot the device now!</string>
+    <string name="noSimCard">No SIM card</string>
 </resources>
