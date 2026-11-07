@@ -134,8 +134,8 @@ private fun HomeScreenPreview() {
     Pixel5GTheme {
         HomeScreen(
             sims = listOf(
-                Sim(0, 1, "Vodafone"),
-                Sim(1, 2, "T-Mobile"),
+                Sim(0, 1, null, 0, "Vodafone"),
+                Sim(1, 2, null, 0, "T-Mobile"),
             ),
             onChangeMode = { _, _ -> },
         )

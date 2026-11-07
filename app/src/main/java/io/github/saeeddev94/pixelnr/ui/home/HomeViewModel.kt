@@ -12,6 +12,7 @@ import androidx.lifecycle.viewModelScope
 import io.github.saeeddev94.pixelnr.Modem
 import io.github.saeeddev94.pixelnr.NrManual
 import io.github.saeeddev94.pixelnr.NrMode
+import io.github.saeeddev94.pixelnr.SimCard
 import io.github.saeeddev94.pixelnr.extensions.hasPermission
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -31,6 +32,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     private val mutex = Mutex()
     private val modem = Modem(context).also {
+        addCloseable(it)
+    }
+    private val simCard = SimCard(context).also {
         addCloseable(it)
     }
 
@@ -150,12 +154,27 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 Log.e(TAG, "activeSubscriptionInfoList: ${it.message}")
             }.getOrNull()
                 .orEmpty()
+            val iccIds = when (sims.isEmpty()) {
+                true -> emptyMap()
+                false -> runCatching {
+                    simCard.iccIds()
+                }.onFailure {
+                    Log.e(TAG, "iccIds: ${it.message}")
+                }.getOrDefault(emptyMap())
+            }
+            val list = sims
                 .sortedBy { it.simSlotIndex }
                 .map {
-                    Sim(it.simSlotIndex, it.subscriptionId, "${it.displayName}")
+                    Sim(
+                        index = it.simSlotIndex,
+                        subscriptionId = it.subscriptionId,
+                        iccId = iccIds[it.subscriptionId],
+                        carrierId = it.carrierId,
+                        name = "${it.displayName}",
+                    )
                 }
             withContext(Dispatchers.Main) {
-                this@HomeViewModel.sims = sims
+                this@HomeViewModel.sims = list
                 done()
             }
         }
@@ -163,7 +182,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun updateSim(sim: Sim, state: SimState) {
         val list = sims?.toMutableList() ?: return
-        val index = list.indexOfFirst { sim.id == it.id }
+        val index = list.indexOfFirst { sim.subscriptionId == it.subscriptionId }
         if (index == -1) return
         list[index] = list[index].copy(state = state)
         sims = list.toList()
