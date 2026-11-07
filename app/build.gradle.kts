@@ -3,10 +3,12 @@ plugins {
     alias(libs.plugins.kotlin.parcelize)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.screenshot)
 }
 
 android {
     namespace = "io.github.saeeddev94.pixelnr"
+    experimentalProperties["android.experimental.enableScreenshotTest"] = true
     compileSdk {
         version = release(37) {
             minorApiLevel = 1
@@ -18,8 +20,8 @@ android {
         applicationId = "io.github.saeeddev94.pixelnr"
         minSdk = 31
         targetSdk = 37
-        versionCode = 8
-        versionName = "2.2.0"
+        versionCode = 9
+        versionName = "3.0.0"
     }
 
     compileOptions {
@@ -67,4 +69,7 @@ dependencies {
 
     implementation(libs.androidx.activity.compose)
     implementation(libs.topjohnwu.libsu.core)
+
+    screenshotTestImplementation(libs.screenshot.validation.api)
+    screenshotTestImplementation(libs.androidx.ui.tooling)
 }

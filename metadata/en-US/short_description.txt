@@ -1,1 +1,1 @@
-Config pixel modem NR mode 
+Change the 5G NR mode and enable VoLTE on rooted Pixel phones

@@ -1,0 +1,7 @@
+- Settings for each SIM, switch SIMs from the bottom bar
+- Enable VoLTE, VoNR, Wi-Fi calling and video calling, every option can be customized
+- Status bar options: show 4G instead of LTE, show the LTE+ icon
+- IMS registration status
+- Apply calling settings by restarting the phone service, no reboot needed
+- Reboot button after changing the NR mode
+- Setup screen for root access and the phone permission

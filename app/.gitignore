@@ -1,2 +1,5 @@
 /build
 /release
+
+# rendered previews, copied to metadata/en-US/images/phoneScreenshots
+/src/screenshotTestDebug/

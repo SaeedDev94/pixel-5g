@@ -1,5 +1,23 @@
-In some countries, Pixel doesn't allow you to connect 5G NSA network
-The default NR config is SA only
+Unlock the network features your Pixel hides in some countries.
 
-But with this app and root access you can change the modem NR mode to NSA or event better SA+NSA
-This app works only on Pixel with samsung modem (Pixel 6-9)
+In some countries, Pixel only allows 5G SA, and VoLTE or Wi-Fi calling are not available. With root access, this app changes the modem and carrier settings, separately for each SIM.
+
+<b>5G</b>
+- Change the modem NR mode: SA, NSA, SA+NSA or disabled
+
+<b>Calling</b>
+- VoLTE, VoNR, Wi-Fi calling and video calling
+- Enhanced 4G LTE mode options
+- See the IMS registration status of each SIM
+- Apply changes by restarting the phone service, no reboot needed
+
+<b>Status bar</b>
+- Show 4G instead of LTE
+- Show the LTE+ icon
+
+<b>Requirements</b>
+- Root access (Magisk or KernelSU)
+- Pixel with Samsung modem (Pixel 6-9)
+- Android 12 or newer
+
+Calling options work like the Pixel IMS Magisk module: they are added to the carrier config of each SIM. If the module is installed, disable it to avoid conflicts.
