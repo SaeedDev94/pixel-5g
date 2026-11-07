@@ -43,5 +43,21 @@ class Modem(val context: Context) : AutoCloseable {
         return root.exec(command)
     }
 
+    @Throws(Exception::class)
+    fun getIccIds(): Map<Int, String> {
+        val result = root.exec(
+            "content query --uri content://telephony/siminfo " +
+                    "--projection _id:icc_id --where \"sim_id>=0\""
+        )
+        if (!result.isSuccess) {
+            throw Exception("getIccIds: command failed: ${result.err.joinToString("\n")}")
+        }
+        val regex = "_id=(\\d+), icc_id=(\\w+)".toRegex()
+        return result.out.mapNotNull { line ->
+            val match = regex.find(line) ?: return@mapNotNull null
+            match.groupValues[1].toInt() to match.groupValues[2]
+        }.toMap()
+    }
+
     override fun close() = root.close()
 }

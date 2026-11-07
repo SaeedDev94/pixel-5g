@@ -12,7 +12,6 @@ import androidx.lifecycle.viewModelScope
 import io.github.saeeddev94.pixelnr.Modem
 import io.github.saeeddev94.pixelnr.NrManual
 import io.github.saeeddev94.pixelnr.NrMode
-import io.github.saeeddev94.pixelnr.SimCard
 import io.github.saeeddev94.pixelnr.extensions.hasPermission
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -32,9 +31,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     private val mutex = Mutex()
     private val modem = Modem(context).also {
-        addCloseable(it)
-    }
-    private val simCard = SimCard(context).also {
         addCloseable(it)
     }
 
@@ -157,7 +153,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             val iccIds = when (sims.isEmpty()) {
                 true -> emptyMap()
                 false -> runCatching {
-                    simCard.iccIds()
+                    modem.getIccIds()
                 }.onFailure {
                     Log.e(TAG, "iccIds: ${it.message}")
                 }.getOrDefault(emptyMap())
