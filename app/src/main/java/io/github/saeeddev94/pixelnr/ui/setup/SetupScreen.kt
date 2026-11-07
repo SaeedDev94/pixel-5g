@@ -110,3 +110,17 @@ private fun SetupScreenNothingGrantedPreview() {
         )
     }
 }
+
+@Preview
+@Composable
+private fun SetupScreenRootGrantedPreview() {
+    Pixel5GTheme {
+        SetupScreen(
+            state = MainUiState.Setup(rootGranted = true, phoneStateGranted = false),
+            showRootDialog = false,
+            onDismissRootDialog = {},
+            onRequestRoot = {},
+            onRequestPhoneState = {},
+        )
+    }
+}

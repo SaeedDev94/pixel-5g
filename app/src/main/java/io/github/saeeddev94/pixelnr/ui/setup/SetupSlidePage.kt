@@ -53,6 +53,7 @@ fun SetupSlidePage(
             text = stringResource(slide.description),
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.headlineSmall,
+            minLines = 2,
         )
         when (slide.granted) {
             true -> Icon(
