@@ -114,10 +114,14 @@ fun HomeScreen(
             }
         }
     ) { innerPadding ->
+        val sim = sims?.getOrNull(selectedTab)
         when {
             sims == null -> Unit
+            sim == null -> NoSimPage(
+                modifier = Modifier.fillMaxSize().padding(innerPadding),
+            )
             else -> SimPage(
-                sim = sims.getOrNull(selectedTab),
+                sim = sim,
                 modifier = Modifier.fillMaxSize().padding(innerPadding),
             )
         }

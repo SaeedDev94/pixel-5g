@@ -16,21 +16,9 @@ import io.github.saeeddev94.pixelnr.R
 
 @Composable
 fun SimPage(
-    sim: Sim?,
+    sim: Sim,
     modifier: Modifier = Modifier,
 ) {
-    if (sim == null) {
-        Box(
-            modifier = modifier,
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                text = stringResource(R.string.noSimCard),
-                style = MaterialTheme.typography.headlineSmall,
-            )
-        }
-        return
-    }
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.Center,
