@@ -19,7 +19,7 @@
     <string name="changeNrModeTitle">NR mód</string>
     <string name="cancel">Mégsem</string>
     <string name="ok">OK</string>
-    <string name="rebootDevice">Most indítsa újra az eszközt!</string>
+    <string name="rebootRequired">Újraindítás szükséges</string>
     <string name="noSimCard">Nincs SIM-kártya</string>
     <string name="settingsNetwork">Hálózat</string>
     <string name="simSlot">SIM %1$d</string>

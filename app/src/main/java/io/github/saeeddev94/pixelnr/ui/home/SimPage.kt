@@ -23,6 +23,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.github.saeeddev94.pixelnr.ImsOption
@@ -138,14 +142,23 @@ fun SimPage(
 private fun NrModeSummary(state: SimState) {
     when (state) {
         SimState.Loading -> Text(stringResource(R.string.nrModeLoading))
-        is SimState.Loaded -> Column {
-            Text(state.mode.label)
-            if (state.rebootRequired) {
-                Text(
-                    text = stringResource(R.string.rebootDevice),
-                    color = MaterialTheme.colorScheme.primary,
-                )
-            }
+        // one line on purpose: a second line makes it a three-line item, which top-aligns the icons
+        is SimState.Loaded -> {
+            val rebootRequired = stringResource(R.string.rebootRequired)
+            val accent = MaterialTheme.colorScheme.primary
+            Text(
+                text = buildAnnotatedString {
+                    append(state.mode.label)
+                    if (state.rebootRequired) {
+                        append(" · ")
+                        withStyle(SpanStyle(color = accent)) {
+                            append(rebootRequired)
+                        }
+                    }
+                },
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
         }
         is SimState.Failed -> Text(
             text = state.reason ?: stringResource(R.string.nrModeError),

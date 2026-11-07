@@ -19,7 +19,7 @@
     <string name="changeNrModeTitle">NR Mode</string>
     <string name="cancel">Cancel</string>
     <string name="ok">OK</string>
-    <string name="rebootDevice">Reboot the device now!</string>
+    <string name="rebootRequired">Reboot required</string>
     <string name="noSimCard">No SIM card</string>
     <string name="settingsNetwork">Network</string>
     <string name="simSlot">SIM %1$d</string>
