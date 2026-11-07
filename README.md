@@ -13,7 +13,7 @@ With root access, this app changes the modem and carrier settings, separately fo
 
 Or download the latest APK from the [Releases Section](https://github.com/SaeedDev94/pixel-5g/releases/latest).
 
-<img src="metadata/en-US/images/phoneScreenshots/01-SIM-SETTINGS.png" height="600" /> <img src="metadata/en-US/images/phoneScreenshots/02-NR-MODE.png" height="600" /> <img src="metadata/en-US/images/phoneScreenshots/03-DARK.png" height="600" />
+<img src="metadata/en-US/images/phoneScreenshots/01-SIM-SETTINGS.png" height="600" /> <img src="metadata/en-US/images/phoneScreenshots/02-NR-MODE.png" height="600" /> <img src="metadata/en-US/images/phoneScreenshots/03-REBOOT.png" height="600" />
 
 ## Features
 

@@ -57,7 +57,7 @@ private fun Home(sims: List<Sim>) {
 }
 
 @PreviewTest
-@Preview(device = DEVICE, showSystemUi = true)
+@Preview(device = DEVICE, showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun SimSettingsScreenshot() {
     Pixel5GTheme {
@@ -75,7 +75,7 @@ fun SimSettingsScreenshot() {
 }
 
 @PreviewTest
-@Preview(device = DEVICE, showSystemUi = true)
+@Preview(device = DEVICE, showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun NrModeScreenshot() {
     Pixel5GTheme {
@@ -98,7 +98,7 @@ fun NrModeScreenshot() {
 @PreviewTest
 @Preview(device = DEVICE, showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-fun DarkScreenshot() {
+fun RebootScreenshot() {
     Pixel5GTheme {
         Home(
             sims(
