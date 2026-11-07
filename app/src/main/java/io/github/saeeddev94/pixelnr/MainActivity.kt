@@ -51,12 +51,24 @@ class MainActivity : ComponentActivity() {
 
                 when (val state = mainViewModel.state) {
                     MainUiState.Checking -> Unit
-                    MainUiState.Ready -> HomeScreen(
-                        sims = homeViewModel.sims,
-                        onChangeMode = { sim, value ->
-                            homeViewModel.changeNrMode(sim, value)
-                        },
-                    )
+                    MainUiState.Ready -> {
+                        LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+                            homeViewModel.refreshImsRegistration()
+                        }
+                        HomeScreen(
+                            sims = homeViewModel.sims,
+                            imsModuleActive = homeViewModel.imsModuleActive,
+                            registrationRefreshing = homeViewModel.registrationRefreshing,
+                            onChangeMode = { sim, value ->
+                                homeViewModel.changeNrMode(sim, value)
+                            },
+                            onImsChange = { sim, option, value ->
+                                homeViewModel.setImsOption(sim, option, value)
+                            },
+                            onRestartPhoneService = { homeViewModel.restartPhoneService() },
+                            onReboot = { homeViewModel.reboot() },
+                        )
+                    }
                     is MainUiState.Setup -> SetupScreen(
                         state = state,
                         showRootDialog = showRootDialog,

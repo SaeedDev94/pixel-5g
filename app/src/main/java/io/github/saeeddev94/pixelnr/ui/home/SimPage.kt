@@ -6,14 +6,16 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.SimCard
+import androidx.compose.material.icons.filled.RestartAlt
 import androidx.compose.material.icons.filled._5g
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -23,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import io.github.saeeddev94.pixelnr.ImsOption
 import io.github.saeeddev94.pixelnr.NrMode
 import io.github.saeeddev94.pixelnr.R
 import io.github.saeeddev94.pixelnr.ui.theme.Pixel5GTheme
@@ -30,11 +33,17 @@ import io.github.saeeddev94.pixelnr.ui.theme.Pixel5GTheme
 @Composable
 fun SimPage(
     sim: Sim,
+    imsModuleActive: Boolean,
+    registrationRefreshing: Boolean,
     onChangeMode: (value: NrMode) -> Unit,
+    onImsChange: (option: ImsOption, value: Boolean) -> Unit,
+    onRestartPhoneService: () -> Unit,
+    onReboot: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     // keyed by SIM, so switching tabs doesn't carry an open dialog over
     var showNrModeDialog by rememberSaveable(sim.subscriptionId) { mutableStateOf(false) }
+    var showRebootDialog by rememberSaveable { mutableStateOf(false) }
     val state = sim.state
 
     if (showNrModeDialog) {
@@ -48,24 +57,32 @@ fun SimPage(
         )
     }
 
+    if (showRebootDialog) {
+        AlertDialog(
+            title = { Text(stringResource(R.string.rebootTitle)) },
+            text = { Text(stringResource(R.string.rebootMessage)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showRebootDialog = false
+                        onReboot()
+                    },
+                ) {
+                    Text(stringResource(R.string.reboot))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showRebootDialog = false }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            },
+            onDismissRequest = { showRebootDialog = false },
+        )
+    }
+
     Column(
         modifier = modifier.verticalScroll(rememberScrollState()),
     ) {
-        ListItem(
-            leadingContent = {
-                Icon(Icons.Default.SimCard, contentDescription = null)
-            },
-            headlineContent = {
-                Text(
-                    text = sim.name,
-                    style = MaterialTheme.typography.titleLarge,
-                )
-            },
-            supportingContent = {
-                Text(stringResource(R.string.simSlot, sim.index + 1))
-            },
-        )
-        HorizontalDivider()
         SettingsHeader(text = stringResource(R.string.settingsNetwork))
         ListItem(
             modifier = Modifier.clickable(
@@ -90,8 +107,29 @@ fun SimPage(
                         )
                     }
                 }
+                is SimState.Loaded if state.rebootRequired -> {
+                    {
+                        IconButton(onClick = { showRebootDialog = true }) {
+                            Icon(
+                                imageVector = Icons.Default.RestartAlt,
+                                contentDescription = stringResource(R.string.reboot),
+                                tint = MaterialTheme.colorScheme.primary,
+                            )
+                        }
+                    }
+                }
                 else -> null
             },
+        )
+        ImsRegistrationItem(
+            registration = sim.registration,
+            refreshing = registrationRefreshing,
+            onRefresh = onRestartPhoneService,
+        )
+        ImsSection(
+            state = sim.ims,
+            moduleActive = imsModuleActive,
+            onChange = onImsChange,
         )
     }
 }
@@ -129,7 +167,12 @@ private fun SimPagePreview() {
                 name = "Vodafone",
                 state = SimState.Loaded(mode = NrMode.SA, rebootRequired = true),
             ),
+            imsModuleActive = false,
+            registrationRefreshing = false,
             onChangeMode = {},
+            onImsChange = { _, _ -> },
+            onRestartPhoneService = {},
+            onReboot = {},
         )
     }
 }

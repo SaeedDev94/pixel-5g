@@ -3,9 +3,10 @@ package io.github.saeeddev94.pixelnr
 import android.content.Context
 import com.topjohnwu.superuser.Shell
 
-class Modem(val context: Context) : AutoCloseable {
-
-    private val root by lazy { Root(context) }
+class Modem(
+    val context: Context,
+    private val root: Root,
+) {
 
     @Throws(Exception::class)
     inline fun <reified T> getNv(key: String): T where T : Enum<T>, T : NvEnum {
@@ -58,6 +59,4 @@ class Modem(val context: Context) : AutoCloseable {
             match.groupValues[1].toInt() to match.groupValues[2]
         }.toMap()
     }
-
-    override fun close() = root.close()
 }

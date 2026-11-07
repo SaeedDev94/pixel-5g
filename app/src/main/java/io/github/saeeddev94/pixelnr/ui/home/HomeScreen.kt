@@ -1,6 +1,7 @@
 package io.github.saeeddev94.pixelnr.ui.home
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -8,6 +9,7 @@ import androidx.compose.material.icons.filled.SimCard
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -22,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import io.github.saeeddev94.pixelnr.ImsOption
 import io.github.saeeddev94.pixelnr.NrMode
 import io.github.saeeddev94.pixelnr.R
 import io.github.saeeddev94.pixelnr.ui.theme.Pixel5GTheme
@@ -30,16 +33,35 @@ import io.github.saeeddev94.pixelnr.ui.theme.Pixel5GTheme
 @Composable
 fun HomeScreen(
     sims: List<Sim>?,
+    imsModuleActive: Boolean,
+    registrationRefreshing: Boolean,
     onChangeMode: (sim: Sim, value: NrMode) -> Unit,
+    onImsChange: (sim: Sim, option: ImsOption, value: Boolean) -> Unit,
+    onRestartPhoneService: () -> Unit,
+    onReboot: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var selectedTab by rememberSaveable { mutableIntStateOf(0) }
+    val selectedSim = sims?.getOrNull(selectedTab)
 
     Scaffold(
         modifier = modifier,
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.appName)) },
+                title = {
+                    when {
+                        sims == null -> Unit
+                        selectedSim == null -> Text(stringResource(R.string.appName))
+                        else -> Column {
+                            Text(selectedSim.name)
+                            Text(
+                                text = stringResource(R.string.simSlot, selectedSim.index + 1),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                    }
+                },
             )
         },
         bottomBar = {
@@ -55,7 +77,7 @@ fun HomeScreen(
             }
         }
     ) { innerPadding ->
-        val sim = sims?.getOrNull(selectedTab)
+        val sim = selectedSim
         when {
             sims == null -> Box(
                 modifier = Modifier.fillMaxSize().padding(innerPadding),
@@ -68,7 +90,12 @@ fun HomeScreen(
             )
             else -> SimPage(
                 sim = sim,
+                imsModuleActive = imsModuleActive,
+                registrationRefreshing = registrationRefreshing,
                 onChangeMode = { onChangeMode(sim, it) },
+                onImsChange = { option, value -> onImsChange(sim, option, value) },
+                onRestartPhoneService = onRestartPhoneService,
+                onReboot = onReboot,
                 modifier = Modifier.fillMaxSize().padding(innerPadding),
             )
         }
@@ -84,7 +111,12 @@ private fun HomeScreenPreview() {
                 Sim(0, 1, null, 0, "Vodafone"),
                 Sim(1, 2, null, 0, "T-Mobile"),
             ),
+            imsModuleActive = false,
+            registrationRefreshing = false,
             onChangeMode = { _, _ -> },
+            onImsChange = { _, _, _ -> },
+            onRestartPhoneService = {},
+            onReboot = {},
         )
     }
 }
@@ -95,7 +127,12 @@ private fun HomeScreenNoSimPreview() {
     Pixel5GTheme {
         HomeScreen(
             sims = emptyList(),
+            imsModuleActive = false,
+            registrationRefreshing = false,
             onChangeMode = { _, _ -> },
+            onImsChange = { _, _, _ -> },
+            onRestartPhoneService = {},
+            onReboot = {},
         )
     }
 }
@@ -106,7 +143,12 @@ private fun HomeScreenLoadingPreview() {
     Pixel5GTheme {
         HomeScreen(
             sims = null,
+            imsModuleActive = false,
+            registrationRefreshing = false,
             onChangeMode = { _, _ -> },
+            onImsChange = { _, _, _ -> },
+            onRestartPhoneService = {},
+            onReboot = {},
         )
     }
 }

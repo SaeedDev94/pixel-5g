@@ -27,7 +27,9 @@ class Root(
     private fun getShell(): Shell {
         if (::shell.isInitialized && shell.isRoot) return shell
         close()
-        return Shell.Builder.create().build()
+        return Shell.Builder.create()
+            .setFlags(Shell.FLAG_MOUNT_MASTER)
+            .build()
     }
 
     override fun close() {
