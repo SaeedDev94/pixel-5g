@@ -4,5 +4,5 @@ data class Sim(
     val index: Int,
     val id: Int,
     val name: String,
-    val state: HomeUiState = HomeUiState.Loading,
+    val state: SimState = SimState.Loading,
 )

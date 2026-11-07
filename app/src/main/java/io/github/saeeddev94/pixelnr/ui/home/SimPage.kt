@@ -45,19 +45,19 @@ fun SimPage(
         Text(
             modifier = Modifier.padding(bottom = 16.dp),
             text = when (val state = sim.state) {
-                HomeUiState.Loading -> stringResource(R.string.nrModeLoading)
-                is HomeUiState.Loaded -> state.mode.label
-                is HomeUiState.Failed -> stringResource(R.string.nrModeError)
+                SimState.Loading -> stringResource(R.string.nrModeLoading)
+                is SimState.Loaded -> state.mode.label
+                is SimState.Failed -> stringResource(R.string.nrModeError)
             },
             style = MaterialTheme.typography.headlineSmall
         )
         Text(
             text = when (val state = sim.state) {
-                is HomeUiState.Loaded -> when (state.rebootRequired) {
+                is SimState.Loaded -> when (state.rebootRequired) {
                     true -> stringResource(R.string.rebootDevice)
                     false -> ""
                 }
-                is HomeUiState.Failed -> "${state.reason}"
+                is SimState.Failed -> "${state.reason}"
                 else -> ""
             },
             style = MaterialTheme.typography.bodyLarge

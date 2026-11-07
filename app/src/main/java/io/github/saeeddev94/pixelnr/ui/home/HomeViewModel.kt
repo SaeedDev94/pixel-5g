@@ -52,7 +52,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                     withContext(Dispatchers.Main) {
                         updateSim(
                             sim,
-                            HomeUiState.Loading,
+                            SimState.Loading,
                         )
                     }
                     repeat(MAX_RETRIES) { index ->
@@ -68,7 +68,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                             withContext(Dispatchers.Main) {
                                 updateSim(
                                     sim,
-                                    HomeUiState.Loaded(
+                                    SimState.Loaded(
                                         mode = value,
                                         rebootRequired = true,
                                     ),
@@ -80,7 +80,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                             withContext(Dispatchers.Main) {
                                 updateSim(
                                     sim,
-                                    HomeUiState.Failed(
+                                    SimState.Failed(
                                         reason = it.message,
                                     ),
                                 )
@@ -112,7 +112,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                             withContext(Dispatchers.Main) {
                                 updateSim(
                                     sim,
-                                    HomeUiState.Loaded(
+                                    SimState.Loaded(
                                         mode = it,
                                         rebootRequired = false,
                                     ),
@@ -124,7 +124,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                             withContext(Dispatchers.Main) {
                                 updateSim(
                                     sim,
-                                    HomeUiState.Failed(reason = it.message),
+                                    SimState.Failed(reason = it.message),
                                 )
                             }
                             return@loop
@@ -161,7 +161,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    private fun updateSim(sim: Sim, state: HomeUiState) {
+    private fun updateSim(sim: Sim, state: SimState) {
         val list = sims?.toMutableList() ?: return
         val index = list.indexOfFirst { sim.id == it.id }
         if (index == -1) return
