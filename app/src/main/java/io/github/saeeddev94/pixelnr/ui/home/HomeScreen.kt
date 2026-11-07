@@ -4,26 +4,18 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.SimCard
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -41,67 +33,13 @@ fun HomeScreen(
     onChangeMode: (sim: Sim, value: NrMode) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var menuExpanded by remember { mutableStateOf(false) }
-    var selectedMode by rememberSaveable { mutableStateOf<NrMode?>(null) }
     var selectedTab by rememberSaveable { mutableIntStateOf(0) }
-
-    selectedMode?.let { mode ->
-        val sim = sims?.getOrNull(selectedTab) ?: return@let
-        AlertDialog(
-            title = {
-                Text(stringResource(R.string.changeNrModeTitle))
-            },
-            text = {
-                Text(stringResource(R.string.changeNrModeMessage, sim.name, mode.label))
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        selectedMode = null
-                        onChangeMode(sim, mode)
-                    },
-                ) {
-                    Text(stringResource(R.string.yes))
-                }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = { selectedMode = null },
-                ) {
-                    Text(stringResource(R.string.cancel))
-                }
-            },
-            onDismissRequest = { selectedMode = null },
-        )
-    }
 
     Scaffold(
         modifier = modifier,
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.appName)) },
-                actions = {
-                    if (sims.isNullOrEmpty()) return@TopAppBar
-                    IconButton(
-                        onClick = { menuExpanded = true },
-                    ) {
-                        Icon(Icons.Default.MoreVert, contentDescription = null)
-                    }
-                    DropdownMenu(
-                        expanded = menuExpanded,
-                        onDismissRequest = { menuExpanded = false },
-                    ) {
-                        NrMode.entries.forEach { mode ->
-                            DropdownMenuItem(
-                                text = { Text(mode.label) },
-                                onClick = {
-                                    menuExpanded = false
-                                    selectedMode = mode
-                                }
-                            )
-                        }
-                    }
-                }
             )
         },
         bottomBar = {
@@ -130,6 +68,7 @@ fun HomeScreen(
             )
             else -> SimPage(
                 sim = sim,
+                onChangeMode = { onChangeMode(sim, it) },
                 modifier = Modifier.fillMaxSize().padding(innerPadding),
             )
         }
