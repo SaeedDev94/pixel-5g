@@ -30,6 +30,10 @@ Or download the latest APK from the [Releases Section](https://github.com/SaeedD
 - Show 4G instead of LTE
 - Show the LTE+ icon
 
+**Hotspot**
+- Set the Wi-Fi country code: US, GB or AU
+- Apply it on every boot
+
 ## Requirements
 
 - Root access (Magisk or KernelSU)

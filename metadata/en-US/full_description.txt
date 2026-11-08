@@ -15,6 +15,10 @@ In some countries, Pixel only allows 5G SA, and VoLTE or Wi-Fi calling are not a
 - Show 4G instead of LTE
 - Show the LTE+ icon
 
+<b>Hotspot</b>
+- Set the Wi-Fi country code: US, GB or AU
+- Apply it on every boot
+
 <b>Requirements</b>
 - Root access (Magisk or KernelSU)
 - Pixel with Samsung modem (Pixel 6-9)

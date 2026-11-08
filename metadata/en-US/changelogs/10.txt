@@ -1,0 +1,2 @@
+- Hotspot screen: set the Wi-Fi country code (US, GB or AU)
+- Option to apply the Wi-Fi country code on every boot
