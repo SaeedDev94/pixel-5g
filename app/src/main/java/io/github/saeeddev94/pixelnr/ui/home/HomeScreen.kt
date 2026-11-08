@@ -6,9 +6,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.SimCard
+import androidx.compose.material.icons.filled.WifiTethering
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -39,6 +41,7 @@ fun HomeScreen(
     onImsChange: (sim: Sim, option: ImsOption, value: Boolean) -> Unit,
     onRestartPhoneService: () -> Unit,
     onReboot: () -> Unit,
+    onOpenWifiCountry: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var selectedTab by rememberSaveable { mutableIntStateOf(0) }
@@ -60,6 +63,14 @@ fun HomeScreen(
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         }
+                    }
+                },
+                actions = {
+                    if (sims != null) IconButton(onClick = onOpenWifiCountry) {
+                        Icon(
+                            imageVector = Icons.Default.WifiTethering,
+                            contentDescription = stringResource(R.string.hotspotTitle),
+                        )
                     }
                 },
             )
@@ -117,6 +128,7 @@ private fun HomeScreenPreview() {
             onImsChange = { _, _, _ -> },
             onRestartPhoneService = {},
             onReboot = {},
+            onOpenWifiCountry = {},
         )
     }
 }
@@ -133,6 +145,7 @@ private fun HomeScreenNoSimPreview() {
             onImsChange = { _, _, _ -> },
             onRestartPhoneService = {},
             onReboot = {},
+            onOpenWifiCountry = {},
         )
     }
 }
@@ -149,6 +162,7 @@ private fun HomeScreenLoadingPreview() {
             onImsChange = { _, _, _ -> },
             onRestartPhoneService = {},
             onReboot = {},
+            onOpenWifiCountry = {},
         )
     }
 }

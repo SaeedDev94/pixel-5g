@@ -54,4 +54,16 @@
     <string name="reboot">Reboot</string>
     <string name="rebootTitle">Reboot now?</string>
     <string name="rebootMessage">The new NR mode applies after a reboot.</string>
+    <string name="back">Back</string>
+    <string name="hotspotTitle">Hotspot</string>
+    <string name="wifiCountryCurrent">Current country code</string>
+    <string name="wifiCountryUnknown">Unknown</string>
+    <string name="wifiCountryCode">Country code</string>
+    <string name="wifiCountryBoot">Boot</string>
+    <string name="wifiCountryApplyOnBoot">Apply on boot</string>
+    <string name="wifiCountryApplyOnBootSummary">Set %1$s after every reboot</string>
+    <string name="wifiCountryApplyOnBootEmpty">Choose a country code first</string>
+    <string name="countryUs">United States</string>
+    <string name="countryGb">United Kingdom</string>
+    <string name="countryAu">Australia</string>
 </resources>

@@ -54,4 +54,16 @@
     <string name="reboot">Újraindítás</string>
     <string name="rebootTitle">Újraindítja most?</string>
     <string name="rebootMessage">Az új NR mód újraindítás után lép életbe.</string>
+    <string name="back">Vissza</string>
+    <string name="hotspotTitle">Hotspot</string>
+    <string name="wifiCountryCurrent">Jelenlegi országkód</string>
+    <string name="wifiCountryUnknown">Ismeretlen</string>
+    <string name="wifiCountryCode">Országkód</string>
+    <string name="wifiCountryBoot">Indítás</string>
+    <string name="wifiCountryApplyOnBoot">Alkalmazás indításkor</string>
+    <string name="wifiCountryApplyOnBootSummary">%1$s beállítása minden újraindítás után</string>
+    <string name="wifiCountryApplyOnBootEmpty">Előbb válasszon országkódot</string>
+    <string name="countryUs">Egyesült Államok</string>
+    <string name="countryGb">Egyesült Királyság</string>
+    <string name="countryAu">Ausztrália</string>
 </resources>

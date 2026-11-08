@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
@@ -13,6 +14,8 @@ import androidx.activity.viewModels
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
@@ -22,11 +25,14 @@ import io.github.saeeddev94.pixelnr.ui.main.MainUiState
 import io.github.saeeddev94.pixelnr.ui.main.MainViewModel
 import io.github.saeeddev94.pixelnr.ui.setup.SetupScreen
 import io.github.saeeddev94.pixelnr.ui.theme.Pixel5GTheme
+import io.github.saeeddev94.pixelnr.ui.wifi.WifiCountryScreen
+import io.github.saeeddev94.pixelnr.ui.wifi.WifiCountryViewModel
 
 class MainActivity : ComponentActivity() {
 
     private val mainViewModel: MainViewModel by viewModels()
     private val homeViewModel: HomeViewModel by viewModels()
+    private val wifiCountryViewModel: WifiCountryViewModel by viewModels()
 
     private val phoneStateLauncher = registerForActivityResult(RequestPermission()) {
         if (it) return@registerForActivityResult
@@ -44,6 +50,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             Pixel5GTheme {
                 var showRootDialog by remember { mutableStateOf(false) }
+                var showWifiCountry by rememberSaveable { mutableStateOf(false) }
+                val homeStateHolder = rememberSaveableStateHolder()
 
                 LifecycleEventEffect(Lifecycle.Event.ON_STOP) {
                     showRootDialog = false
@@ -51,23 +59,40 @@ class MainActivity : ComponentActivity() {
 
                 when (val state = mainViewModel.state) {
                     MainUiState.Checking -> Unit
-                    MainUiState.Ready -> {
+                    MainUiState.Ready -> if (showWifiCountry) {
+                        BackHandler { showWifiCountry = false }
+                        LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+                            wifiCountryViewModel.refresh()
+                        }
+                        WifiCountryScreen(
+                            state = wifiCountryViewModel.state,
+                            applying = wifiCountryViewModel.applying,
+                            savedCode = wifiCountryViewModel.savedCode,
+                            applyOnBoot = wifiCountryViewModel.applyOnBoot,
+                            onCodeChange = { wifiCountryViewModel.setCode(it) },
+                            onApplyOnBootChange = { wifiCountryViewModel.changeApplyOnBoot(it) },
+                            onBack = { showWifiCountry = false },
+                        )
+                    } else {
                         LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
                             homeViewModel.refreshImsRegistration()
                         }
-                        HomeScreen(
-                            sims = homeViewModel.sims,
-                            imsModuleActive = homeViewModel.imsModuleActive,
-                            registrationRefreshing = homeViewModel.registrationRefreshing,
-                            onChangeMode = { sim, value ->
-                                homeViewModel.changeNrMode(sim, value)
-                            },
-                            onImsChange = { sim, option, value ->
-                                homeViewModel.setImsOption(sim, option, value)
-                            },
-                            onRestartPhoneService = { homeViewModel.restartPhoneService() },
-                            onReboot = { homeViewModel.reboot() },
-                        )
+                        homeStateHolder.SaveableStateProvider("home") {
+                            HomeScreen(
+                                sims = homeViewModel.sims,
+                                imsModuleActive = homeViewModel.imsModuleActive,
+                                registrationRefreshing = homeViewModel.registrationRefreshing,
+                                onChangeMode = { sim, value ->
+                                    homeViewModel.changeNrMode(sim, value)
+                                },
+                                onImsChange = { sim, option, value ->
+                                    homeViewModel.setImsOption(sim, option, value)
+                                },
+                                onRestartPhoneService = { homeViewModel.restartPhoneService() },
+                                onReboot = { homeViewModel.reboot() },
+                                onOpenWifiCountry = { showWifiCountry = true },
+                            )
+                        }
                     }
                     is MainUiState.Setup -> SetupScreen(
                         state = state,

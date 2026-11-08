@@ -53,6 +53,7 @@ private fun Home(sims: List<Sim>) {
         onImsChange = { _, _, _ -> },
         onRestartPhoneService = {},
         onReboot = {},
+        onOpenWifiCountry = {},
     )
 }
 
