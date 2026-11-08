@@ -4,6 +4,14 @@ on:
   push:
     tags:
       - '*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to release'
+        required: true
+
+env:
+  TAG: ${{ inputs.tag || github.ref_name }}
 
 jobs:
   build:
@@ -13,6 +21,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v7
+        with:
+          ref: refs/tags/${{ env.TAG }}
 
       - name: Get Version Code
         run: |
@@ -49,7 +59,7 @@ jobs:
         run: |
           BUILD="${{ github.workspace }}/app/build/outputs/apk/release/app-release.apk"
           DIST="${{ github.workspace }}/app/release"
-          NAME="Pixel5G-$GITHUB_REF_NAME.apk"
+          NAME="Pixel5G-$TAG.apk"
           mkdir "$DIST"
           mv "$BUILD" "$DIST/$NAME"
           echo "DIST=$DIST" >> $GITHUB_ENV
@@ -57,8 +67,8 @@ jobs:
       - name: Publish release
         uses: softprops/action-gh-release@v3
         with:
-          tag_name: ${{ github.ref_name }}
-          name: ${{ github.ref_name }}
+          tag_name: ${{ env.TAG }}
+          name: ${{ env.TAG }}
           prerelease: false
           draft: false
           files: ${{ env.DIST }}/*
