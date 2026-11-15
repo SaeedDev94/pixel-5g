@@ -66,4 +66,14 @@
     <string name="countryUs">United States</string>
     <string name="countryGb">United Kingdom</string>
     <string name="countryAu">Australia</string>
+    <string name="networkConnected">Connected network</string>
+    <string name="networkNoService">No service</string>
+    <string name="networkUnknown">Unknown</string>
+    <string name="network2g" translatable="false">2G</string>
+    <string name="network3g" translatable="false">3G</string>
+    <string name="network4g" translatable="false">4G</string>
+    <string name="network4gPlus" translatable="false">4G+</string>
+    <string name="network4_5g" translatable="false">4.5G</string>
+    <string name="network5gNsa" translatable="false">5G NSA</string>
+    <string name="network5gSa" translatable="false">5G SA</string>
 </resources>

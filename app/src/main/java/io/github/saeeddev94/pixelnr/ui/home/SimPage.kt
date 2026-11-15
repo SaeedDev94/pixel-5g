@@ -7,6 +7,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.RestartAlt
+import androidx.compose.material.icons.filled.SignalCellularAlt
 import androidx.compose.material.icons.filled._5g
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
@@ -87,7 +88,27 @@ fun SimPage(
     Column(
         modifier = modifier.verticalScroll(rememberScrollState()),
     ) {
-        SettingsHeader(text = stringResource(R.string.settingsNetwork))
+        SettingsHeader(
+            text = stringResource(R.string.settingsNetwork),
+        )
+        ListItem(
+            leadingContent = {
+                Icon(
+                    imageVector = Icons.Default.SignalCellularAlt,
+                    contentDescription = null,
+                )
+            },
+            headlineContent = {
+                Text(
+                    text = stringResource(R.string.networkConnected),
+                )
+            },
+            supportingContent = {
+                Text(
+                    text = stringResource(sim.network?.title ?: R.string.nrModeLoading),
+                )
+            },
+        )
         ListItem(
             modifier = Modifier.clickable(
                 enabled = state !is SimState.Loading,

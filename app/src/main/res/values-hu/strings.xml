@@ -66,4 +66,7 @@
     <string name="countryUs">Egyesült Államok</string>
     <string name="countryGb">Egyesült Királyság</string>
     <string name="countryAu">Ausztrália</string>
+    <string name="networkConnected">Csatlakoztatott hálózat</string>
+    <string name="networkNoService">Nincs szolgáltatás</string>
+    <string name="networkUnknown">Ismeretlen</string>
 </resources>

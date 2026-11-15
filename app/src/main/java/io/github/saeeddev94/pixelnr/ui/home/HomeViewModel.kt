@@ -56,6 +56,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     init {
         resolveActiveSims {
             this@HomeViewModel.sims?.forEach { sim ->
+                watchNetwork(sim)
                 resolveNrMode(sim)
                 resolveIms(sim)
             }
@@ -66,6 +67,19 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             withContext(Dispatchers.Main) {
                 imsModuleActive = active
             }
+        }
+    }
+
+    private fun watchNetwork(sim: Sim) {
+        runCatching {
+            CellNetworkWatcher(sim, context) { network ->
+                updateSim(sim) { it.copy(network = network) }
+            }.also {
+                it.start()
+                addCloseable(it)
+            }
+        }.onFailure {
+            Log.e(TAG, "watchNetwork: ${it.message}")
         }
     }
 
@@ -89,6 +103,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             }.onFailure {
                 Log.e(TAG, "restartPhoneService: ${it.message}")
             }
+            @Suppress("Unused")
             for (attempt in 1..REGISTRATION_POLLS) {
                 delay(REGISTRATION_POLL_INTERVAL)
                 val registrations = loadRegistrations()

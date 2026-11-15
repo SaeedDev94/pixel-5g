@@ -11,4 +11,5 @@ data class Sim(
     val state: SimState = SimState.Loading,
     val ims: ImsState = ImsState.Loading,
     val registration: ImsRegistration? = null,
+    val network: CellNetwork? = null,
 )
