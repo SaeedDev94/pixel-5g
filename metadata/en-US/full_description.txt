@@ -4,6 +4,7 @@ In some countries, Pixel only allows 5G SA, and VoLTE or Wi-Fi calling are not a
 
 <b>5G</b>
 - Change the modem NR mode: SA, NSA, SA+NSA or disabled
+- See the connected network of each SIM: 2G to 5G NSA/SA, updated live
 
 <b>Calling</b>
 - VoLTE, VoNR, Wi-Fi calling and video calling

@@ -19,6 +19,7 @@ Or download the latest APK from the [Releases Section](https://github.com/SaeedD
 
 **5G**
 - Change the modem NR mode: SA, NSA, SA+NSA or disabled
+- See the connected network of each SIM: 2G to 5G NSA/SA, updated live
 
 **Calling**
 - VoLTE, VoNR, Wi-Fi calling and video calling
