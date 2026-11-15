@@ -67,12 +67,25 @@ class CarrierConfig(
         appendLine(BLOCK_END)
     }
 
-    private fun path(iccId: String, carrierId: Int) =
-        "$DIR/carrierconfig-com.google.android.carrier-$iccId-$carrierId.xml"
+    private fun path(iccId: String, carrierId: Int): String {
+        val result = root.exec("ls -t $DIR/carrierconfig-*-$iccId-$carrierId.xml")
+        val files = result.out.map { it.trim() }.filter { it.isNotEmpty() }
+        if (!result.isSuccess || files.isEmpty()) {
+            Log.e(TAG, "path: code=${result.code} err=${result.err.joinToString("\n")}")
+            throw Exception(context.getString(R.string.imsConfigNotFound))
+        }
+        return CONFIG_PACKAGES.firstNotNullOfOrNull { pkg ->
+            files.firstOrNull { it.startsWith("$DIR/carrierconfig-$pkg-") }
+        } ?: files.first()
+    }
 
     companion object {
         private const val TAG = "CarrierConfig"
         private const val DIR = "/data/user_de/0/com.android.phone/files"
+        private val CONFIG_PACKAGES = listOf(
+            "com.google.android.carrier",
+            "com.android.carrierconfig",
+        )
         private const val BUNDLE_END = "</bundle>"
         private const val BLOCK_START = "<!--PIXEL_5G_START-->"
         private const val BLOCK_END = "<!--PIXEL_5G_END-->"
